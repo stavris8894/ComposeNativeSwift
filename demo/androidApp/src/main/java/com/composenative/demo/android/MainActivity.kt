@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
                     // On Android, hosts the shared showcase tree
                     Box(modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = "ComposeNative Android Host - Tab: ${showcaseScreen.selectedTab.name}",
+                            text = "ComposeNative Android Host - Tab: ${showcaseScreen.viewModel.selectedTab.name}",
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.fillMaxWidth()
                         )

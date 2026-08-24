@@ -1,46 +1,16 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.FormViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
 /**
- * Form and Inputs Showcase Screen written in Kotlin Compose.
- * Renders into native SwiftUI Form/TextField/Toggle/Slider/DatePicker/Stepper/Rating/Menu components!
+ * Form and Inputs Showcase Screen using FormViewModel in Kotlin Common.
  */
-class FormInputsScreen : CNScreen() {
-    var searchQuery by mutableStateOf("")
-    var name by mutableStateOf("")
-    var email by mutableStateOf("")
-    var password by mutableStateOf("")
-    var selectedRole by mutableStateOf("Mobile Architect")
-    var isSubscribed by mutableStateOf(true)
-    var experienceYears by mutableStateOf(5f)
-    var teamSize by mutableStateOf(4.0)
-    var rating by mutableStateOf(5)
-    var birthDateMs by mutableStateOf(1072915200000L) // Jan 1, 2004
-    var isSubmitted by mutableStateOf(false)
-    var errorMessage by mutableStateOf("")
-
-    private fun validateAndSubmit() {
-        if (name.isBlank()) {
-            errorMessage = "Name cannot be blank"
-            isSubmitted = false
-            return
-        }
-        if (!email.contains("@") || !email.contains(".")) {
-            errorMessage = "Please enter a valid email"
-            isSubmitted = false
-            return
-        }
-        if (password.length < 6) {
-            errorMessage = "Password must be at least 6 characters"
-            isSubmitted = false
-            return
-        }
-        errorMessage = ""
-        isSubmitted = true
-    }
+class FormInputsScreen(
+    viewModel: FormViewModel = FormViewModel()
+) : CNScreenWithViewModel<FormViewModel>(viewModel) {
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(
@@ -56,8 +26,8 @@ class FormInputsScreen : CNScreen() {
             // Live Search Bar
             item {
                 SearchBar(
-                    query = searchQuery,
-                    onQueryChange = { searchQuery = it },
+                    query = viewModel.searchQuery,
+                    onQueryChange = { viewModel.searchQuery = it },
                     placeholder = "Search profiles or settings...",
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -76,8 +46,8 @@ class FormInputsScreen : CNScreen() {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("Full Name", style = TextStyle.LabelLarge, fontWeight = FontWeight.SemiBold)
                     OutlinedTextField(
-                        value = name,
-                        onValueChange = { name = it },
+                        value = viewModel.name,
+                        onValueChange = { viewModel.name = it },
                         placeholder = "e.g. John Appleseed",
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -89,8 +59,8 @@ class FormInputsScreen : CNScreen() {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("Email Address", style = TextStyle.LabelLarge, fontWeight = FontWeight.SemiBold)
                     OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
+                        value = viewModel.email,
+                        onValueChange = { viewModel.email = it },
                         placeholder = "name@example.com",
                         keyboardType = KeyboardType.Email,
                         modifier = Modifier.fillMaxWidth()
@@ -103,8 +73,8 @@ class FormInputsScreen : CNScreen() {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("Password", style = TextStyle.LabelLarge, fontWeight = FontWeight.SemiBold)
                     OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
+                        value = viewModel.password,
+                        onValueChange = { viewModel.password = it },
                         placeholder = "At least 6 characters",
                         isSecure = true,
                         keyboardType = KeyboardType.Password,
@@ -129,13 +99,13 @@ class FormInputsScreen : CNScreen() {
                     ) {
                         Column {
                             Text("Assigned Role", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
-                            Text(selectedRole, style = TextStyle.BodySmall, color = CNColor.Primary)
+                            Text(viewModel.selectedRole, style = TextStyle.BodySmall, color = CNColor.Primary)
                         }
-                        DropdownMenu(title = selectedRole) {
-                            item(title = "Mobile Architect", icon = "laptopcomputer", onClick = { selectedRole = "Mobile Architect" })
-                            item(title = "iOS Lead", icon = "apple.logo", onClick = { selectedRole = "iOS Lead" })
-                            item(title = "Android Lead", icon = "antenna.radiowaves.left.and.right", onClick = { selectedRole = "Android Lead" })
-                            item(title = "Product Designer", icon = "paintbrush", onClick = { selectedRole = "Product Designer" })
+                        DropdownMenu(title = viewModel.selectedRole) {
+                            item(title = "Mobile Architect", icon = "laptopcomputer", onClick = { viewModel.selectedRole = "Mobile Architect" })
+                            item(title = "iOS Lead", icon = "apple.logo", onClick = { viewModel.selectedRole = "iOS Lead" })
+                            item(title = "Android Lead", icon = "antenna.radiowaves.left.and.right", onClick = { viewModel.selectedRole = "Android Lead" })
+                            item(title = "Product Designer", icon = "paintbrush", onClick = { viewModel.selectedRole = "Product Designer" })
                         }
                     }
                 }
@@ -156,8 +126,8 @@ class FormInputsScreen : CNScreen() {
                     ) {
                         Text("Date of Birth", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
                         DatePicker(
-                            timestampMs = birthDateMs,
-                            onDateChange = { birthDateMs = it },
+                            timestampMs = viewModel.birthDateMs,
+                            onDateChange = { viewModel.birthDateMs = it },
                             title = "Birth Date",
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -180,8 +150,8 @@ class FormInputsScreen : CNScreen() {
                     ) {
                         Text("Engineering Team Size", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
                         Stepper(
-                            value = teamSize,
-                            onValueChange = { teamSize = it },
+                            value = viewModel.teamSize,
+                            onValueChange = { viewModel.teamSize = it },
                             range = 1.0..50.0,
                             step = 1.0,
                             label = "Developers",
@@ -207,8 +177,8 @@ class FormInputsScreen : CNScreen() {
                     ) {
                         Text("KMP Satisfaction Rating", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
                         RatingBar(
-                            rating = rating,
-                            onRatingChange = { rating = it },
+                            rating = viewModel.rating,
+                            onRatingChange = { viewModel.rating = it },
                             maxRating = 5
                         )
                     }
@@ -234,8 +204,8 @@ class FormInputsScreen : CNScreen() {
                             Text("Get weekly multiplatform updates", style = TextStyle.Caption)
                         }
                         Switch(
-                            checked = isSubscribed,
-                            onCheckedChange = { isSubscribed = it }
+                            checked = viewModel.isSubscribed,
+                            onCheckedChange = { viewModel.isSubscribed = it }
                         )
                     }
                 }
@@ -259,11 +229,11 @@ class FormInputsScreen : CNScreen() {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Experience Level", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
-                            Text("${experienceYears.toInt()} Years", style = TextStyle.BodyLarge, color = CNColor.Primary, fontWeight = FontWeight.Bold)
+                            Text("${viewModel.experienceYears.toInt()} Years", style = TextStyle.BodyLarge, color = CNColor.Primary, fontWeight = FontWeight.Bold)
                         }
                         Slider(
-                            value = experienceYears,
-                            onValueChange = { experienceYears = it },
+                            value = viewModel.experienceYears,
+                            onValueChange = { viewModel.experienceYears = it },
                             valueRange = 0f..15f,
                             steps = 14
                         )
@@ -272,7 +242,7 @@ class FormInputsScreen : CNScreen() {
             }
 
             // Error Feedback
-            if (errorMessage.isNotBlank()) {
+            if (viewModel.errorMessage.isNotBlank()) {
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -280,7 +250,7 @@ class FormInputsScreen : CNScreen() {
                         border = CNBorder(1.dp, CNColor.Error)
                     ) {
                         Text(
-                            text = errorMessage,
+                            text = viewModel.errorMessage,
                             color = CNColor.Error,
                             style = TextStyle.BodyMedium,
                             modifier = Modifier.padding(12.dp)
@@ -290,7 +260,7 @@ class FormInputsScreen : CNScreen() {
             }
 
             // Success Feedback
-            if (isSubmitted) {
+            if (viewModel.isSubmitted) {
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -302,8 +272,8 @@ class FormInputsScreen : CNScreen() {
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text("Registration Successful!", color = CNColor.Success, fontWeight = FontWeight.Bold)
-                            Text("Welcome aboard, $name ($email)", style = TextStyle.BodyMedium)
-                            Text("Role: $selectedRole | Team: ${teamSize.toInt()} devs | Rating: $rating/5", style = TextStyle.Caption)
+                            Text("Welcome aboard, ${viewModel.name} (${viewModel.email})", style = TextStyle.BodyMedium)
+                            Text("Role: ${viewModel.selectedRole} | Team: ${viewModel.teamSize.toInt()} devs | Rating: ${viewModel.rating}/5", style = TextStyle.Caption)
                         }
                     }
                 }
@@ -312,7 +282,7 @@ class FormInputsScreen : CNScreen() {
             // Submit Button
             item {
                 Button(
-                    onClick = { validateAndSubmit() },
+                    onClick = { viewModel.submit() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp)

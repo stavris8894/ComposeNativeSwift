@@ -1,16 +1,16 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.CounterViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
 /**
- * Interactive Counter Screen written in Kotlin Compose.
- * Renders into 100% genuine native SwiftUI components on iOS and Jetpack Compose on Android!
+ * Interactive Counter Screen using CounterViewModel in Kotlin Common.
  */
-class CounterScreen : CNScreen() {
-    var count by mutableStateOf(0)
-    var step by mutableStateOf(1)
+class CounterScreen(
+    viewModel: CounterViewModel = CounterViewModel()
+) : CNScreenWithViewModel<CounterViewModel>(viewModel) {
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(
@@ -41,26 +41,26 @@ class CounterScreen : CNScreen() {
                     ) {
                         add(
                             Text(
-                                text = "Native SwiftUI from Kotlin",
+                                text = "Kotlin ViewModel Counter",
                                 style = TextStyle.H5,
                                 color = CNColor.Primary
                             )
                         )
                         add(
                             Text(
-                                text = "Count",
+                                text = "Current Value",
                                 style = TextStyle.Caption
                             )
                         )
                         add(
                             Text(
-                                text = "$count",
+                                text = "${viewModel.count}",
                                 style = TextStyle(
                                     fontSize = 48.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = when {
-                                        count > 0 -> CNColor.Success
-                                        count < 0 -> CNColor.Error
+                                        viewModel.count > 0 -> CNColor.Success
+                                        viewModel.count < 0 -> CNColor.Error
                                         else -> CNColor.OnSurface
                                     }
                                 )
@@ -77,23 +77,25 @@ class CounterScreen : CNScreen() {
                 ) {
                     add(
                         Button(
-                            onClick = { count -= step },
+                            onClick = { viewModel.decrement() },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp)
                                 .background(CNColor.Error, CNShape.RoundedCorner(12.dp))
+                                .haptic(CNHapticType.Medium)
                         ) {
-                            Text("-$step", color = CNColor.White, style = TextStyle.Button)
+                            Text("-${viewModel.step}", color = CNColor.White, style = TextStyle.Button)
                         }
                     )
 
                     add(
                         Button(
-                            onClick = { count = 0 },
+                            onClick = { viewModel.reset() },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp)
                                 .background(CNColor.Gray, CNShape.RoundedCorner(12.dp))
+                                .haptic(CNHapticType.Light)
                         ) {
                             Text("Reset", color = CNColor.White, style = TextStyle.Button)
                         }
@@ -101,13 +103,14 @@ class CounterScreen : CNScreen() {
 
                     add(
                         Button(
-                            onClick = { count += step },
+                            onClick = { viewModel.increment() },
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp)
                                 .background(CNColor.Success, CNShape.RoundedCorner(12.dp))
+                                .haptic(CNHapticType.Medium)
                         ) {
-                            Text("+$step", color = CNColor.White, style = TextStyle.Button)
+                            Text("+${viewModel.step}", color = CNColor.White, style = TextStyle.Button)
                         }
                     )
                 }
@@ -125,15 +128,15 @@ class CounterScreen : CNScreen() {
                     ) {
                         add(
                             Text(
-                                text = "Step Size: $step",
+                                text = "Step Size: ${viewModel.step}",
                                 style = TextStyle.BodyMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
                         )
                         add(
                             Slider(
-                                value = step.toFloat(),
-                                onValueChange = { step = it.toInt().coerceAtLeast(1) },
+                                value = viewModel.step.toFloat(),
+                                onValueChange = { viewModel.updateStep(it.toInt()) },
                                 valueRange = 1f..10f,
                                 steps = 9
                             )

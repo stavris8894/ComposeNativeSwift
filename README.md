@@ -96,20 +96,41 @@ dependencies: [
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start & ViewModel Architecture
 
-### 1. Define your Screen in Kotlin (`commonMain`)
+### 1. Define Business Logic & State in Kotlin (`commonMain`)
 
-Subclass `CNScreen` and write familiar Compose declarative code:
+Keep 100% of your state and business logic in a `CNViewModel`:
+
+```kotlin
+package com.example.shared.viewmodels
+
+import com.composenative.swift.core.CNViewModel
+
+class CounterViewModel : CNViewModel() {
+    var count by mutableStateOf(0)
+    var step by mutableStateOf(1)
+
+    fun increment() { count += step }
+    fun decrement() { count -= step }
+    fun reset() { count = 0 }
+}
+```
+
+### 2. Build the Screen (`commonMain`)
+
+Subclass `CNScreenWithViewModel` and write familiar Compose declarative UI:
 
 ```kotlin
 package com.example.shared
 
+import com.example.shared.viewmodels.CounterViewModel
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
-class CounterScreen : CNScreen() {
-    var count by mutableStateOf(0)
+class CounterScreen(
+    viewModel: CounterViewModel = CounterViewModel()
+) : CNScreenWithViewModel<CounterViewModel>(viewModel) {
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(title = "ComposeNative Counter"),
@@ -120,9 +141,9 @@ class CounterScreen : CNScreen() {
         ) {
             add(
                 Text(
-                    text = "Count: $count",
+                    text = "Count: ${viewModel.count}",
                     style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold),
-                    color = if (count >= 0) CNColor.Primary else CNColor.Error
+                    color = if (viewModel.count >= 0) CNColor.Primary else CNColor.Error
                 )
             )
             add(
@@ -132,7 +153,7 @@ class CounterScreen : CNScreen() {
                 ) {
                     add(
                         Button(
-                            onClick = { count-- },
+                            onClick = { viewModel.decrement() },
                             modifier = Modifier.weight(1f).height(48.dp).haptic(CNHapticType.Light)
                         ) {
                             Text("Decrement")
@@ -140,7 +161,7 @@ class CounterScreen : CNScreen() {
                     )
                     add(
                         Button(
-                            onClick = { count++ },
+                            onClick = { viewModel.increment() },
                             modifier = Modifier.weight(1f).height(48.dp).haptic(CNHapticType.Light)
                         ) {
                             Text("Increment")
@@ -153,9 +174,9 @@ class CounterScreen : CNScreen() {
 }
 ```
 
-### 2. Display in SwiftUI (`iOS App`)
+### 3. Display in SwiftUI (`iOS App`)
 
-Display the Kotlin screen in exactly **1 line of SwiftUI**:
+Swift code is kept to an absolute minimum — just **1 line of SwiftUI**:
 
 ```swift
 import SwiftUI
@@ -169,7 +190,7 @@ struct ContentView: View {
 }
 ```
 
-State changes in Kotlin automatically notify SwiftUI to re-render the native view tree reactively!
+All state mutations in Kotlin `CNViewModel` automatically notify SwiftUI to re-render genuine native views reactively!
 
 ---
 

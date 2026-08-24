@@ -205,4 +205,45 @@ final class ComposeNativeSwiftTests: XCTestCase {
 
         waitForExpectations(timeout: 1.0)
     }
+
+    func testViewModelObserverUpdate() {
+        class MockViewModel: CNStateObservableViewModel {
+            var value: String = "Initial"
+            private var listeners: [() -> Void] = []
+            var isCleared = false
+
+            func addStateListener(_ listener: @escaping () -> Void) -> () -> Void {
+                listeners.append(listener)
+                return { [weak self] in
+                    self?.listeners.removeAll()
+                }
+            }
+
+            func update(newValue: String) {
+                value = newValue
+                listeners.forEach { $0() }
+            }
+
+            func onCleared() {
+                isCleared = true
+                listeners.removeAll()
+            }
+        }
+
+        let vm = MockViewModel()
+        let observer = CNViewModelObserver(viewModel: vm)
+        XCTAssertEqual(observer.version, 0)
+
+        let exp = expectation(description: "Wait for VM state update")
+        vm.update(newValue: "Updated Value")
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            XCTAssertEqual(observer.version, 1)
+            XCTAssertEqual(observer.viewModel.value, "Updated Value")
+            exp.fulfill()
+        }
+
+        waitForExpectations(timeout: 1.0)
+    }
 }
+

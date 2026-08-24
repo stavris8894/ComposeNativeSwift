@@ -1,5 +1,6 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.ShowcaseViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
@@ -15,29 +16,20 @@ enum class ShowcaseTab {
 }
 
 /**
- * Showcase Master Screen that hosts and toggles between all demo screens.
+ * Showcase Master Screen hosting all demo features.
+ * All state and business logic reside in ShowcaseViewModel in Common Kotlin!
  */
-class ShowcaseScreen : CNScreen() {
-    var selectedTab by mutableStateOf(ShowcaseTab.Navigation)
+class ShowcaseScreen(
+    viewModel: ShowcaseViewModel = ShowcaseViewModel()
+) : CNScreenWithViewModel<ShowcaseViewModel>(viewModel) {
 
-    private val navigationDemoScreen = NavigationDemoScreen()
-    private val counterScreen = CounterScreen()
-    private val formScreen = FormInputsScreen()
-    private val feedScreen = FeedScreen()
-    private val profileScreen = ProfileScreen()
-    private val componentsScreen = ComponentsShowcaseScreen()
-    private val settingsScreen = SettingsScreen()
-
-    init {
-        registerState(counterScreen.run { mutableStateOf(0) }) // Bind nested sub-screens
-        navigationDemoScreen.addListener { notifyStateChanged() }
-        counterScreen.addListener { notifyStateChanged() }
-        formScreen.addListener { notifyStateChanged() }
-        feedScreen.addListener { notifyStateChanged() }
-        profileScreen.addListener { notifyStateChanged() }
-        componentsScreen.addListener { notifyStateChanged() }
-        settingsScreen.addListener { notifyStateChanged() }
-    }
+    private val navigationScreen = NavigationDemoScreen(viewModel.navigationViewModel)
+    private val counterScreen = CounterScreen(viewModel.counterViewModel)
+    private val formScreen = FormInputsScreen(viewModel.formViewModel)
+    private val feedScreen = FeedScreen(viewModel.feedViewModel)
+    private val profileScreen = ProfileScreen(viewModel.profileViewModel)
+    private val componentsScreen = ComponentsShowcaseScreen(viewModel.componentsViewModel)
+    private val settingsScreen = SettingsScreen(viewModel.settingsViewModel)
 
     override fun build(): CNNode = Column(modifier = Modifier.fillMaxSize()) {
         // Tab Navigation Bar
@@ -55,9 +47,9 @@ class ShowcaseScreen : CNScreen() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     for (tab in ShowcaseTab.entries) {
-                        val isSelected = selectedTab == tab
+                        val isSelected = viewModel.selectedTab == tab
                         Button(
-                            onClick = { selectedTab = tab },
+                            onClick = { viewModel.selectTab(tab) },
                             modifier = Modifier
                                 .background(
                                     if (isSelected) CNColor.Primary.copyWithAlpha(0.15f) else CNColor.Transparent,
@@ -78,10 +70,10 @@ class ShowcaseScreen : CNScreen() {
             }
         )
 
-        // Screen Body
+        // Screen Body powered by ViewModel
         add(
-            when (selectedTab) {
-                ShowcaseTab.Navigation -> navigationDemoScreen.render()
+            when (viewModel.selectedTab) {
+                ShowcaseTab.Navigation -> navigationScreen.render()
                 ShowcaseTab.Counter -> counterScreen.render()
                 ShowcaseTab.Form -> formScreen.render()
                 ShowcaseTab.Feed -> feedScreen.render()

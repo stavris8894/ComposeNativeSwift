@@ -1,25 +1,16 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.ProfileViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
 /**
- * Profile Screen showcasing Cards, Custom Layouts, Dynamic Stats, and Buttons.
+ * Profile Screen using ProfileViewModel in Kotlin Common.
  */
-class ProfileScreen : CNScreen() {
-    var isFollowing by mutableStateOf(false)
-    var followerCount by mutableStateOf(1420)
-
-    private fun toggleFollow() {
-        if (isFollowing) {
-            followerCount--
-            isFollowing = false
-        } else {
-            followerCount++
-            isFollowing = true
-        }
-    }
+class ProfileScreen(
+    viewModel: ProfileViewModel = ProfileViewModel()
+) : CNScreenWithViewModel<ProfileViewModel>(viewModel) {
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(
@@ -54,10 +45,10 @@ class ProfileScreen : CNScreen() {
                                 .border(CNBorder(3.dp, CNColor.Primary, CNShape.Circle))
                         )
 
-                        Text("Elena Rostova", style = TextStyle.H4)
-                        Text("Staff Mobile Architect", style = TextStyle.BodyMedium, color = CNColor.Gray)
+                        Text(viewModel.name, style = TextStyle.H4)
+                        Text(viewModel.title, style = TextStyle.BodyMedium, color = CNColor.Gray)
                         Text(
-                            "Building ultra-fast cross-platform applications with Kotlin Multiplatform & SwiftUI native components.",
+                            viewModel.bio,
                             style = TextStyle.BodyMedium,
                             textAlign = TextAlign.Center,
                             lineHeight = 20.sp
@@ -71,7 +62,7 @@ class ProfileScreen : CNScreen() {
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$followerCount", style = TextStyle.H5, fontWeight = FontWeight.Bold)
+                                Text("${viewModel.followerCount}", style = TextStyle.H5, fontWeight = FontWeight.Bold)
                                 Text("Followers", style = TextStyle.Caption)
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -92,28 +83,30 @@ class ProfileScreen : CNScreen() {
                             horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             Button(
-                                onClick = { toggleFollow() },
+                                onClick = { viewModel.toggleFollow() },
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(44.dp)
                                     .background(
-                                        if (isFollowing) CNColor.Gray else CNColor.Primary,
+                                        if (viewModel.isFollowing) CNColor.Gray else CNColor.Primary,
                                         CNShape.RoundedCorner(10.dp)
                                     )
+                                    .haptic(CNHapticType.Light)
                             ) {
                                 Text(
-                                    if (isFollowing) "Following" else "Follow",
+                                    if (viewModel.isFollowing) "Following" else "Follow",
                                     color = CNColor.White,
                                     style = TextStyle.Button
                                 )
                             }
 
                             Button(
-                                onClick = { /* Send message */ },
+                                onClick = { /* Message */ },
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(44.dp)
                                     .background(CNColor.SurfaceVariant, CNShape.RoundedCorner(10.dp))
+                                    .haptic(CNHapticType.Light)
                             ) {
                                 Text("Message", color = CNColor.OnSurface, style = TextStyle.Button)
                             }

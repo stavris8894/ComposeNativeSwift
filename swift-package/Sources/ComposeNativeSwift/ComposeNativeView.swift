@@ -7,6 +7,11 @@ public protocol CNStateObservableScreen: AnyObject {
     func onDispose()
 }
 
+public protocol CNStateObservableViewModel: AnyObject {
+    func addStateListener(_ listener: @escaping () -> Void) -> () -> Void
+    func onCleared()
+}
+
 public class CNStateObserver: ObservableObject {
     @Published public var currentNode: CNRenderableNode
     private var unbind: (() -> Void)?
@@ -30,6 +35,26 @@ public class CNStateObserver: ObservableObject {
     }
 }
 
+public class CNViewModelObserver<VM: CNStateObservableViewModel>: ObservableObject {
+    @Published public var version: Int = 0
+    public let viewModel: VM
+    private var unbind: (() -> Void)?
+
+    public init(viewModel: VM) {
+        self.viewModel = viewModel
+        self.unbind = viewModel.addStateListener { [weak self] in
+            DispatchQueue.main.async {
+                self?.version += 1
+            }
+        }
+    }
+
+    deinit {
+        unbind?()
+        viewModel.onCleared()
+    }
+}
+
 /**
  * The single developer entry point in SwiftUI.
  *
@@ -37,7 +62,13 @@ public class CNStateObserver: ObservableObject {
  * ```swift
  * struct ContentView: View {
  *     var body: some View {
- *         ComposeNativeView(CounterScreen())
+ *         // 1. Using a Screen with embedded ViewModels:
+ *         ComposeNativeView(screen: ShowcaseScreen())
+ *
+ *         // 2. Or using a dedicated ViewModel:
+ *         ComposeNativeViewModelView(viewModel: CounterViewModel()) { vm in
+ *             // content
+ *         }
  *     }
  * }
  * ```
@@ -61,5 +92,22 @@ public struct ComposeNativeView: View {
             .onDisappear {
                 screen?.onDispose()
             }
+    }
+}
+
+/**
+ * Renders a view directly bound to a Kotlin CNViewModel.
+ */
+public struct ComposeNativeViewModelView<VM: CNStateObservableViewModel>: View {
+    @StateObject private var observer: CNViewModelObserver<VM>
+    private let content: (VM) -> CNRenderableNode
+
+    public init(viewModel: VM, content: @escaping (VM) -> CNRenderableNode) {
+        _observer = StateObject(wrappedValue: CNViewModelObserver(viewModel: viewModel))
+        self.content = content
+    }
+
+    public var body: some View {
+        CNNodeRenderer(node: content(observer.viewModel))
     }
 }

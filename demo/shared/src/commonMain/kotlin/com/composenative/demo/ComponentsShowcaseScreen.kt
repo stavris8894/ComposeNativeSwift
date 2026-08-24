@@ -1,22 +1,16 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.ComponentsViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
 /**
- * Pagers, Glassmorphism, and Interactive Native Components Showcase Screen.
+ * Pagers, Glassmorphism, and Components Showcase using ComponentsViewModel in Kotlin Common.
  */
-class ComponentsShowcaseScreen : CNScreen() {
-    var currentPage by mutableStateOf(0)
-    var showSnackbar by mutableStateOf(false)
-    var snackbarMessage by mutableStateOf("")
-
-    private val pagerItems = listOf(
-        Triple("Zero Overhead", "Translates Compose Virtual Trees directly to genuine SwiftUI native views.", "bolt.fill"),
-        Triple("Native 120 FPS", "Full Apple ProMotion & CoreAnimation rendering without canvas layers.", "speedometer"),
-        Triple("Material 3 & Dark Mode", "Automatic dynamic color resolution matching iOS system color schemes.", "moon.stars.fill")
-    )
+class ComponentsShowcaseScreen(
+    viewModel: ComponentsViewModel = ComponentsViewModel()
+) : CNScreenWithViewModel<ComponentsViewModel>(viewModel) {
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(
@@ -33,7 +27,7 @@ class ComponentsShowcaseScreen : CNScreen() {
                 Text("Native Page Carousel", style = TextStyle.H4)
             }
 
-            // Native Pager (TabView .page style)
+            // Native Pager
             item {
                 Card(
                     modifier = Modifier
@@ -43,12 +37,12 @@ class ComponentsShowcaseScreen : CNScreen() {
                     elevation = 2.dp
                 ) {
                     HorizontalPager(
-                        pageCount = pagerItems.size,
-                        currentPage = currentPage,
-                        onPageChange = { currentPage = it },
+                        pageCount = viewModel.pagerItems.size,
+                        currentPage = viewModel.currentPage,
+                        onPageChange = { viewModel.currentPage = it },
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        pages(pagerItems) { item ->
+                        pages(viewModel.pagerItems) { item ->
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -103,8 +97,7 @@ class ComponentsShowcaseScreen : CNScreen() {
             item {
                 Button(
                     onClick = {
-                        snackbarMessage = "Triggered native feedback at page $currentPage"
-                        showSnackbar = true
+                        viewModel.triggerFeedback("Triggered native feedback at page ${viewModel.currentPage}")
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -116,12 +109,12 @@ class ComponentsShowcaseScreen : CNScreen() {
                 }
             }
 
-            if (showSnackbar) {
+            if (viewModel.showSnackbar) {
                 item {
                     Snackbar(
-                        message = snackbarMessage,
+                        message = viewModel.snackbarMessage,
                         actionLabel = "DISMISS",
-                        onAction = { showSnackbar = false }
+                        onAction = { viewModel.dismissFeedback() }
                     )
                 }
             }

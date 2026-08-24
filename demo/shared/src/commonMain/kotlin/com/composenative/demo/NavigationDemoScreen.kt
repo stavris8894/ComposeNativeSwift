@@ -1,5 +1,6 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.NavigationViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
@@ -15,31 +16,14 @@ data class TechItem(
 )
 
 /**
- * Full Multi-Screen Navigation Demo with Liquid Glass Navigation Bar.
+ * Multi-Screen Navigation Demo using NavigationViewModel in Kotlin Common.
  */
-class NavigationDemoScreen : CNScreen() {
-    val navController = rememberNavController()
-
-    // Screen State
-    var selectedItemId by mutableStateOf("vision-pro")
-    var quantity by mutableStateOf(1.0)
-    var deliveryDateMs by mutableStateOf(1735689600000L) // Jan 1, 2025
-    var customerNotes by mutableStateOf("")
-
-    private val catalogItems = listOf(
-        TechItem("vision-pro", "Apple Vision Pro 2", "Spatial computing headset with M4 silicon", "$3,499", "eyeglasses", "Flagship"),
-        TechItem("macbook-ultra", "MacBook Pro Ultra 16\"", "M4 Max 128GB unified memory", "$4,199", "laptopcomputer", "Pro Performance"),
-        TechItem("iphone-pro", "iPhone 17 Pro Titanium", "A19 Pro chip with tetraprism periscope", "$1,199", "iphone", "Bestseller"),
-        TechItem("watch-ultra", "Apple Watch Ultra 3", "MicroLED display with satellite SOS", "$799", "applewatch", "Adventure")
-    )
-
-    init {
-        registerState(navController.run { mutableStateOf(0) })
-        navController.addStateListener { notifyStateChanged() }
-    }
+class NavigationDemoScreen(
+    viewModel: NavigationViewModel = NavigationViewModel()
+) : CNScreenWithViewModel<NavigationViewModel>(viewModel) {
 
     override fun build(): CNNode = NavHost(
-        navController = navController,
+        navController = viewModel.navController,
         startDestination = "catalog"
     ) {
         // =====================================================================
@@ -66,13 +50,13 @@ class NavigationDemoScreen : CNScreen() {
 
                 item {
                     Text(
-                        text = "Tap any product to navigate into the detail screen with Liquid Glass navigation transitions.",
+                        text = "Powered entirely by Kotlin NavigationViewModel with zero state in Swift.",
                         style = TextStyle.BodyMedium,
                         color = CNColor.Gray
                     )
                 }
 
-                items(catalogItems) { item ->
+                items(viewModel.catalogItems) { item ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -83,11 +67,7 @@ class NavigationDemoScreen : CNScreen() {
                                 cornerRadius = 18.dp
                             )
                             .clickable {
-                                selectedItemId = item.id
-                                navController.navigate(
-                                    route = "details",
-                                    arguments = mapOf("itemId" to item.id)
-                                )
+                                viewModel.selectItem(item.id)
                             }
                             .padding(16.dp)
                     ) {
@@ -130,7 +110,7 @@ class NavigationDemoScreen : CNScreen() {
             title = "Device Specification",
             navBarStyle = CNNavBarStyle.LiquidGlass
         ) {
-            val item = catalogItems.find { it.id == selectedItemId } ?: catalogItems.first()
+            val item = viewModel.catalogItems.find { it.id == viewModel.selectedItemId } ?: viewModel.catalogItems.first()
 
             LazyColumn(
                 modifier = Modifier
@@ -183,8 +163,8 @@ class NavigationDemoScreen : CNScreen() {
                         ) {
                             Text("Select Order Quantity", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
                             Stepper(
-                                value = quantity,
-                                onValueChange = { quantity = it },
+                                value = viewModel.quantity,
+                                onValueChange = { viewModel.quantity = it },
                                 range = 1.0..10.0,
                                 step = 1.0,
                                 label = "Units",
@@ -198,7 +178,7 @@ class NavigationDemoScreen : CNScreen() {
                 item {
                     Button(
                         onClick = {
-                            navController.navigate("checkout")
+                            viewModel.proceedToCheckout()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -220,7 +200,7 @@ class NavigationDemoScreen : CNScreen() {
             title = "Order Checkout",
             navBarStyle = CNNavBarStyle.LiquidGlass
         ) {
-            val item = catalogItems.find { it.id == selectedItemId } ?: catalogItems.first()
+            val item = viewModel.catalogItems.find { it.id == viewModel.selectedItemId } ?: viewModel.catalogItems.first()
 
             LazyColumn(
                 modifier = Modifier
@@ -245,7 +225,7 @@ class NavigationDemoScreen : CNScreen() {
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("${item.title} (x${quantity.toInt()})", style = TextStyle.BodyMedium)
+                                Text("${item.title} (x${viewModel.quantity.toInt()})", style = TextStyle.BodyMedium)
                                 Text(item.price, style = TextStyle.BodyMedium, fontWeight = FontWeight.Bold)
                             }
                         }
@@ -267,8 +247,8 @@ class NavigationDemoScreen : CNScreen() {
                         ) {
                             Text("Desired Delivery Date", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
                             DatePicker(
-                                timestampMs = deliveryDateMs,
-                                onDateChange = { deliveryDateMs = it },
+                                timestampMs = viewModel.deliveryDateMs,
+                                onDateChange = { viewModel.deliveryDateMs = it },
                                 title = "Delivery Date",
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -281,8 +261,8 @@ class NavigationDemoScreen : CNScreen() {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text("Delivery Instructions", style = TextStyle.LabelLarge, fontWeight = FontWeight.SemiBold)
                         OutlinedTextField(
-                            value = customerNotes,
-                            onValueChange = { customerNotes = it },
+                            value = viewModel.customerNotes,
+                            onValueChange = { viewModel.customerNotes = it },
                             placeholder = "e.g. Leave at front door or ring bell",
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -293,10 +273,7 @@ class NavigationDemoScreen : CNScreen() {
                 item {
                     Button(
                         onClick = {
-                            navController.navigate(
-                                route = "success",
-                                navOptions = CNNavOptions(launchSingleTop = true)
-                            )
+                            viewModel.confirmOrder()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -348,7 +325,7 @@ class NavigationDemoScreen : CNScreen() {
                         )
                         Text("Order Placed Successfully!", style = TextStyle.H4, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                         Text(
-                            "Your multi-screen navigation flow completed seamlessly with real-time backstack popping.",
+                            "Your multi-screen navigation flow completed seamlessly via Kotlin NavigationViewModel.",
                             style = TextStyle.BodyMedium,
                             color = CNColor.Gray,
                             textAlign = TextAlign.Center
@@ -360,7 +337,7 @@ class NavigationDemoScreen : CNScreen() {
 
                 Button(
                     onClick = {
-                        navController.popUpTo("catalog", inclusive = false)
+                        viewModel.returnToCatalog()
                     },
                     modifier = Modifier
                         .fillMaxWidth()

@@ -1,17 +1,16 @@
 package com.composenative.demo
 
+import com.composenative.demo.viewmodels.SettingsViewModel
 import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
 /**
- * Settings Screen showcasing grouped controls, switches, sliders, and dividers.
+ * Settings Screen using SettingsViewModel in Kotlin Common.
  */
-class SettingsScreen : CNScreen() {
-    var darkModeEnabled by mutableStateOf(false)
-    var notificationsEnabled by mutableStateOf(true)
-    var biometricAuthEnabled by mutableStateOf(true)
-    var volumeLevel by mutableStateOf(0.75f)
+class SettingsScreen(
+    viewModel: SettingsViewModel = SettingsViewModel()
+) : CNScreenWithViewModel<SettingsViewModel>(viewModel) {
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(
@@ -43,8 +42,8 @@ class SettingsScreen : CNScreen() {
                         ) {
                             Text("Dark Theme", style = TextStyle.BodyLarge)
                             Switch(
-                                checked = darkModeEnabled,
-                                onCheckedChange = { darkModeEnabled = it }
+                                checked = viewModel.darkModeEnabled,
+                                onCheckedChange = { viewModel.toggleDarkMode(it) }
                             )
                         }
 
@@ -57,8 +56,8 @@ class SettingsScreen : CNScreen() {
                         ) {
                             Text("Push Notifications", style = TextStyle.BodyLarge)
                             Switch(
-                                checked = notificationsEnabled,
-                                onCheckedChange = { notificationsEnabled = it }
+                                checked = viewModel.notificationsEnabled,
+                                onCheckedChange = { viewModel.toggleNotifications(it) }
                             )
                         }
 
@@ -71,8 +70,8 @@ class SettingsScreen : CNScreen() {
                         ) {
                             Text("Face ID / Touch ID", style = TextStyle.BodyLarge)
                             Switch(
-                                checked = biometricAuthEnabled,
-                                onCheckedChange = { biometricAuthEnabled = it }
+                                checked = viewModel.biometricAuthEnabled,
+                                onCheckedChange = { viewModel.toggleBiometrics(it) }
                             )
                         }
                     }
@@ -99,11 +98,11 @@ class SettingsScreen : CNScreen() {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Effects Volume", style = TextStyle.BodyLarge)
-                            Text("${(volumeLevel * 100).toInt()}%", style = TextStyle.BodyLarge, fontWeight = FontWeight.Bold, color = CNColor.Primary)
+                            Text("${(viewModel.volumeLevel * 100).toInt()}%", style = TextStyle.BodyLarge, fontWeight = FontWeight.Bold, color = CNColor.Primary)
                         }
                         Slider(
-                            value = volumeLevel,
-                            onValueChange = { volumeLevel = it },
+                            value = viewModel.volumeLevel,
+                            onValueChange = { viewModel.updateVolume(it) },
                             valueRange = 0f..1f
                         )
                     }
