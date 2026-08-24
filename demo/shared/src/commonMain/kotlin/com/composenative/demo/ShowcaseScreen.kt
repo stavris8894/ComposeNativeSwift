@@ -20,8 +20,9 @@ enum class ShowcaseTab {
  * All state and business logic reside in ShowcaseViewModel in Common Kotlin!
  */
 class ShowcaseScreen(
-    viewModel: ShowcaseViewModel = ShowcaseViewModel()
+    viewModel: ShowcaseViewModel
 ) : CNScreenWithViewModel<ShowcaseViewModel>(viewModel) {
+    constructor() : this(ShowcaseViewModel())
 
     private val navigationScreen = NavigationDemoScreen(viewModel.navigationViewModel)
     private val counterScreen = CounterScreen(viewModel.counterViewModel)

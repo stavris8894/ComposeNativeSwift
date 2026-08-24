@@ -9,8 +9,9 @@ import com.composenative.swift.core.*
  * Feed Screen using FeedViewModel in Kotlin Common.
  */
 class FeedScreen(
-    viewModel: FeedViewModel = FeedViewModel()
+    viewModel: FeedViewModel
 ) : CNScreenWithViewModel<FeedViewModel>(viewModel) {
+    constructor() : this(FeedViewModel())
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(

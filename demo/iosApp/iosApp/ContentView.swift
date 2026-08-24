@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposeNativeSwift
+import SharedApp
 
 /**
  * Clean SwiftUI host view.

@@ -19,8 +19,9 @@ data class TechItem(
  * Multi-Screen Navigation Demo using NavigationViewModel in Kotlin Common.
  */
 class NavigationDemoScreen(
-    viewModel: NavigationViewModel = NavigationViewModel()
+    viewModel: NavigationViewModel
 ) : CNScreenWithViewModel<NavigationViewModel>(viewModel) {
+    constructor() : this(NavigationViewModel())
 
     override fun build(): CNNode = NavHost(
         navController = viewModel.navController,
@@ -76,25 +77,33 @@ class NavigationDemoScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    icon = item.icon,
-                                    tint = CNColor.Primary,
-                                    size = 32.dp
-                                )
-                                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                                    Text(item.title, style = TextStyle.BodyLarge, fontWeight = FontWeight.Bold)
-                                    Text(item.subtitle, style = TextStyle.Caption, color = CNColor.Gray)
-                                    Text(item.price, style = TextStyle.BodyMedium, color = CNColor.Primary, fontWeight = FontWeight.SemiBold)
+                            add(
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    add(
+                                        Icon(
+                                            icon = item.icon,
+                                            tint = CNColor.Primary,
+                                            size = 32.dp
+                                        )
+                                    )
+                                    add(
+                                        Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                                            add(Text(item.title, style = TextStyle.BodyLarge, fontWeight = FontWeight.Bold))
+                                            add(Text(item.subtitle, style = TextStyle.Caption, color = CNColor.Gray))
+                                            add(Text(item.price, style = TextStyle.BodyMedium, color = CNColor.Primary, fontWeight = FontWeight.SemiBold))
+                                        }
+                                    )
                                 }
-                            }
-                            Badge(
-                                text = item.tag,
-                                backgroundColor = CNColor.Primary.copyWithAlpha(0.15f),
-                                contentColor = CNColor.Primary
+                            )
+                            add(
+                                Badge(
+                                    text = item.tag,
+                                    backgroundColor = CNColor.Primary.copyWithAlpha(0.15f),
+                                    contentColor = CNColor.Primary
+                                )
                             )
                         }
                     }
@@ -136,14 +145,16 @@ class NavigationDemoScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(
-                                icon = item.icon,
-                                tint = CNColor.Primary,
-                                size = 64.dp
+                            add(
+                                Icon(
+                                    icon = item.icon,
+                                    tint = CNColor.Primary,
+                                    size = 64.dp
+                                )
                             )
-                            Text(item.title, style = TextStyle.H4, fontWeight = FontWeight.Bold)
-                            Text(item.subtitle, style = TextStyle.BodyMedium, color = CNColor.Gray, textAlign = TextAlign.Center)
-                            Text(item.price, style = TextStyle.H4, color = CNColor.Primary, fontWeight = FontWeight.ExtraBold)
+                            add(Text(item.title, style = TextStyle.H4, fontWeight = FontWeight.Bold))
+                            add(Text(item.subtitle, style = TextStyle.BodyMedium, color = CNColor.Gray, textAlign = TextAlign.Center))
+                            add(Text(item.price, style = TextStyle.H4, color = CNColor.Primary, fontWeight = FontWeight.ExtraBold))
                         }
                     }
                 }
@@ -161,14 +172,16 @@ class NavigationDemoScreen(
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("Select Order Quantity", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
-                            Stepper(
-                                value = viewModel.quantity,
-                                onValueChange = { viewModel.quantity = it },
-                                range = 1.0..10.0,
-                                step = 1.0,
-                                label = "Units",
-                                modifier = Modifier.fillMaxWidth()
+                            add(Text("Select Order Quantity", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium))
+                            add(
+                                Stepper(
+                                    value = viewModel.quantity,
+                                    onValueChange = { viewModel.quantity = it },
+                                    range = 1.0..10.0,
+                                    step = 1.0,
+                                    label = "Units",
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             )
                         }
                     }
@@ -220,14 +233,16 @@ class NavigationDemoScreen(
                                 .padding(18.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("Order Summary", style = TextStyle.H5, fontWeight = FontWeight.Bold)
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("${item.title} (x${viewModel.quantity.toInt()})", style = TextStyle.BodyMedium)
-                                Text(item.price, style = TextStyle.BodyMedium, fontWeight = FontWeight.Bold)
-                            }
+                            add(Text("Order Summary", style = TextStyle.H5, fontWeight = FontWeight.Bold))
+                            add(
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    add(Text("${item.title} (x${viewModel.quantity.toInt()})", style = TextStyle.BodyMedium))
+                                    add(Text(item.price, style = TextStyle.BodyMedium, fontWeight = FontWeight.Bold))
+                                }
+                            )
                         }
                     }
                 }
@@ -245,12 +260,14 @@ class NavigationDemoScreen(
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Text("Desired Delivery Date", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium)
-                            DatePicker(
-                                timestampMs = viewModel.deliveryDateMs,
-                                onDateChange = { viewModel.deliveryDateMs = it },
-                                title = "Delivery Date",
-                                modifier = Modifier.fillMaxWidth()
+                            add(Text("Desired Delivery Date", style = TextStyle.BodyLarge, fontWeight = FontWeight.Medium))
+                            add(
+                                DatePicker(
+                                    timestampMs = viewModel.deliveryDateMs,
+                                    onDateChange = { viewModel.deliveryDateMs = it },
+                                    title = "Delivery Date",
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             )
                         }
                     }
@@ -259,12 +276,14 @@ class NavigationDemoScreen(
                 // Special Instructions Field
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text("Delivery Instructions", style = TextStyle.LabelLarge, fontWeight = FontWeight.SemiBold)
-                        OutlinedTextField(
-                            value = viewModel.customerNotes,
-                            onValueChange = { viewModel.customerNotes = it },
-                            placeholder = "e.g. Leave at front door or ring bell",
-                            modifier = Modifier.fillMaxWidth()
+                        add(Text("Delivery Instructions", style = TextStyle.LabelLarge, fontWeight = FontWeight.SemiBold))
+                        add(
+                            OutlinedTextField(
+                                value = viewModel.customerNotes,
+                                onValueChange = { viewModel.customerNotes = it },
+                                placeholder = "e.g. Leave at front door or ring bell",
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         )
                     }
                 }
@@ -303,50 +322,58 @@ class NavigationDemoScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .liquidGlass(
-                            blurRadius = 30.dp,
-                            tint = CNColor.Success.copyWithAlpha(0.18f),
-                            borderHighlight = CNColor.Success.copyWithAlpha(0.5f),
-                            cornerRadius = 24.dp
-                        )
-                        .padding(24.dp)
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                add(
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .liquidGlass(
+                                blurRadius = 30.dp,
+                                tint = CNColor.Success.copyWithAlpha(0.18f),
+                                borderHighlight = CNColor.Success.copyWithAlpha(0.5f),
+                                cornerRadius = 24.dp
+                            )
+                            .padding(24.dp)
                     ) {
-                        Icon(
-                            icon = "checkmark.seal.fill",
-                            tint = CNColor.Success,
-                            size = 60.dp
-                        )
-                        Text("Order Placed Successfully!", style = TextStyle.H4, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                        Text(
-                            "Your multi-screen navigation flow completed seamlessly via Kotlin NavigationViewModel.",
-                            style = TextStyle.BodyMedium,
-                            color = CNColor.Gray,
-                            textAlign = TextAlign.Center
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            add(
+                                Icon(
+                                    icon = "checkmark.seal.fill",
+                                    tint = CNColor.Success,
+                                    size = 60.dp
+                                )
+                            )
+                            add(Text("Order Placed Successfully!", style = TextStyle.H4, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center))
+                            add(
+                                Text(
+                                    "Your multi-screen navigation flow completed seamlessly via Kotlin NavigationViewModel.",
+                                    style = TextStyle.BodyMedium,
+                                    color = CNColor.Gray,
+                                    textAlign = TextAlign.Center
+                                )
+                            )
+                        }
                     }
-                }
+                )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                add(Spacer(modifier = Modifier.height(24.dp)))
 
-                Button(
-                    onClick = {
-                        viewModel.returnToCatalog()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .background(CNColor.Primary, CNShape.RoundedCorner(14.dp))
-                        .haptic(CNHapticType.Light)
-                ) {
-                    Text("Back to Store Catalog", color = CNColor.White, style = TextStyle.Button)
-                }
+                add(
+                    Button(
+                        onClick = {
+                            viewModel.returnToCatalog()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .background(CNColor.Primary, CNShape.RoundedCorner(14.dp))
+                            .haptic(CNHapticType.Light)
+                    ) {
+                        Text("Back to Store Catalog", color = CNColor.White, style = TextStyle.Button)
+                    }
+                )
             }
         }
     }

@@ -9,8 +9,9 @@ import com.composenative.swift.core.*
  * Settings Screen using SettingsViewModel in Kotlin Common.
  */
 class SettingsScreen(
-    viewModel: SettingsViewModel = SettingsViewModel()
+    viewModel: SettingsViewModel
 ) : CNScreenWithViewModel<SettingsViewModel>(viewModel) {
+    constructor() : this(SettingsViewModel())
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(

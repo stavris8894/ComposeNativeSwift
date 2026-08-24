@@ -1,42 +1,33 @@
 import Foundation
 import SwiftUI
 import ComposeNativeSwift
+import SharedApp
 
-/**
- * Adapter converting Kotlin CNScreen to Swift CNStateObservableScreen.
- * In a full KMP project with SharedApp.framework linked, this bridges
- * Kotlin CNScreen directly to SwiftUI ComposeNativeView.
- */
-public class KotlinScreenBridgeAdapter: CNStateObservableScreen {
-    private let renderBlock: () -> CNRenderableNode
-    private var stateListeners: [() -> Void] = []
-    private var onDisposeBlock: (() -> Void)?
+// MARK: - Native Bridge for Kotlin CNScreen & CNNode
 
-    public init(
-        render: @escaping () -> CNRenderableNode,
-        onDispose: (() -> Void)? = nil
-    ) {
-        self.renderBlock = render
-        self.onDisposeBlock = onDispose
+class SwiftStateListener: NSObject, CNStateListener {
+    private let callback: () -> Void
+
+    init(callback: @escaping () -> Void) {
+        self.callback = callback
     }
 
+    func onStateChanged() {
+        callback()
+    }
+}
+
+extension CNScreen: @retroactive CNStateObservableScreen {
     public func renderSwiftNode() -> CNRenderableNode {
-        return renderBlock()
+        let kotlinNode = self.render()
+        return CNKotlinNodeBridge.convert(kotlinNode)
     }
 
     public func addStateListener(_ listener: @escaping () -> Void) -> () -> Void {
-        stateListeners.append(listener)
+        let stateListener = SwiftStateListener(callback: listener)
+        self.addListener(listener: stateListener)
         return { [weak self] in
-            self?.stateListeners.removeAll()
+            self?.removeListener(listener: stateListener)
         }
-    }
-
-    public func notifyStateChanged() {
-        stateListeners.forEach { $0() }
-    }
-
-    public func onDispose() {
-        stateListeners.removeAll()
-        onDisposeBlock?()
     }
 }

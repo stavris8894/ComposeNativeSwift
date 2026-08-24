@@ -9,8 +9,9 @@ import com.composenative.swift.core.*
  * Profile Screen using ProfileViewModel in Kotlin Common.
  */
 class ProfileScreen(
-    viewModel: ProfileViewModel = ProfileViewModel()
+    viewModel: ProfileViewModel
 ) : CNScreenWithViewModel<ProfileViewModel>(viewModel) {
+    constructor() : this(ProfileViewModel())
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(

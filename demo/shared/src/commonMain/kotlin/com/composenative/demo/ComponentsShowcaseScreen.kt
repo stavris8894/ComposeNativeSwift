@@ -9,8 +9,9 @@ import com.composenative.swift.core.*
  * Pagers, Glassmorphism, and Components Showcase using ComponentsViewModel in Kotlin Common.
  */
 class ComponentsShowcaseScreen(
-    viewModel: ComponentsViewModel = ComponentsViewModel()
+    viewModel: ComponentsViewModel
 ) : CNScreenWithViewModel<ComponentsViewModel>(viewModel) {
+    constructor() : this(ComponentsViewModel())
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(

@@ -9,8 +9,9 @@ import com.composenative.swift.core.*
  * Interactive Counter Screen using CounterViewModel in Kotlin Common.
  */
 class CounterScreen(
-    viewModel: CounterViewModel = CounterViewModel()
+    viewModel: CounterViewModel
 ) : CNScreenWithViewModel<CounterViewModel>(viewModel) {
+    constructor() : this(CounterViewModel())
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(

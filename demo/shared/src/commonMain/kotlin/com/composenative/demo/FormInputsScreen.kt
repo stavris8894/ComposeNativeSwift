@@ -9,8 +9,9 @@ import com.composenative.swift.core.*
  * Form and Inputs Showcase Screen using FormViewModel in Kotlin Common.
  */
 class FormInputsScreen(
-    viewModel: FormViewModel = FormViewModel()
+    viewModel: FormViewModel
 ) : CNScreenWithViewModel<FormViewModel>(viewModel) {
+    constructor() : this(FormViewModel())
 
     override fun build(): CNNode = Scaffold(
         topBar = TopAppBar(
