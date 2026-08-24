@@ -25,6 +25,26 @@ Unlike standard Compose Multiplatform (which draws on a canvas via Skiko/OpenGL)
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### 🍏 iOS (Genuine SwiftUI + Liquid Glass Navigation)
+
+| Light Mode (Liquid Glass) | Dark Mode (Liquid Glass) |
+| :---: | :---: |
+| <img src="docs/screenshots/ios-liquid-glass-light.jpg" width="360" alt="iOS Liquid Glass Light Mode" /> | <img src="docs/screenshots/ios-liquid-glass-dark.jpg" width="360" alt="iOS Liquid Glass Dark Mode" /> |
+
+### 🤖 Android (Material 3 + Jetpack Compose)
+
+| Light Mode (Material 3) | Dark Mode (Material 3) |
+| :---: | :---: |
+| <img src="docs/screenshots/android-material-light.jpg" width="360" alt="Android Material 3 Light Mode" /> | <img src="docs/screenshots/android-material-dark.jpg" width="360" alt="Android Material 3 Dark Mode" /> |
+
+</div>
+
+---
+
 ## 📦 Installation
 
 ### 1. Kotlin Multiplatform (`build.gradle.kts`)
