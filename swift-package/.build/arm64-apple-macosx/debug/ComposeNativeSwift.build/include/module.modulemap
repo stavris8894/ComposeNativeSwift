@@ -1,0 +1,3 @@
+module ComposeNativeSwift {
+    header "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/include/ComposeNativeSwift-Swift.h"
+}

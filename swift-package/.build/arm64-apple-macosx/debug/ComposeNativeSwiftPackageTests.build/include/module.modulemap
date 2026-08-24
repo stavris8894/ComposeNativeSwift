@@ -1,0 +1,3 @@
+module ComposeNativeSwiftPackageTests {
+    header "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftPackageTests.build/include/ComposeNativeSwiftPackageTests-Swift.h"
+}

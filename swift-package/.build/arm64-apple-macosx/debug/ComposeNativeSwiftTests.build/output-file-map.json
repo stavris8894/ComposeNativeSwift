@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftTests.build/primary.swiftdeps"
+  },
+  "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/Tests/ComposeNativeSwiftTests/ComposeNativeSwiftTests.swift": {
+    "dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftTests.build/ComposeNativeSwiftTests.d",
+    "object": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftTests.build/ComposeNativeSwiftTests.swift.o",
+    "swiftmodule": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftTests.build/ComposeNativeSwiftTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftTests.build/ComposeNativeSwiftTests.swiftdeps",
+    "diagnostics": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwiftTests.build/ComposeNativeSwiftTests.dia"
+  }
+}

@@ -1,0 +1,29 @@
+*.iml
+.gradle
+/build
+!/build.gradle.kts
+!/settings.gradle.kts
+.idea
+.DS_Store
+*.swp
+*.hprof
+.kotlin
+
+# Build output
+**/build/
+**/dist/
+**/out/
+**/.cxx/
+
+# Xcode
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcworkspace/contents.xcworkspacedata
+*.xcworkspace/*
+.swiftpm/
+DerivedData/
+
+# Local configuration
+local.properties
+.env

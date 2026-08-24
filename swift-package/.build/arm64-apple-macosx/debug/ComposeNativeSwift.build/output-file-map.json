@@ -1,0 +1,40 @@
+{
+  "": {
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/primary.swiftdeps"
+  },
+  "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/Sources/ComposeNativeSwift/CNModifierApplier.swift": {
+    "dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNModifierApplier.d",
+    "object": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNModifierApplier.swift.o",
+    "swiftmodule": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNModifierApplier~partial.swiftmodule",
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNModifierApplier.swiftdeps",
+    "diagnostics": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNModifierApplier.dia"
+  },
+  "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/Sources/ComposeNativeSwift/CNNodeModel.swift": {
+    "dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeModel.d",
+    "object": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeModel.swift.o",
+    "swiftmodule": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeModel~partial.swiftmodule",
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeModel.swiftdeps",
+    "diagnostics": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeModel.dia"
+  },
+  "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/Sources/ComposeNativeSwift/CNNodeRenderer.swift": {
+    "dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeRenderer.d",
+    "object": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeRenderer.swift.o",
+    "swiftmodule": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeRenderer~partial.swiftmodule",
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeRenderer.swiftdeps",
+    "diagnostics": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNNodeRenderer.dia"
+  },
+  "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/Sources/ComposeNativeSwift/CNProtocols.swift": {
+    "dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNProtocols.d",
+    "object": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNProtocols.swift.o",
+    "swiftmodule": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNProtocols~partial.swiftmodule",
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNProtocols.swiftdeps",
+    "diagnostics": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/CNProtocols.dia"
+  },
+  "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/Sources/ComposeNativeSwift/ComposeNativeView.swift": {
+    "dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/ComposeNativeView.d",
+    "object": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/ComposeNativeView.swift.o",
+    "swiftmodule": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/ComposeNativeView~partial.swiftmodule",
+    "swift-dependencies": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/ComposeNativeView.swiftdeps",
+    "diagnostics": "/Users/stavrosgeorgiou/dev/ComposeNativeSwift/swift-package/.build/arm64-apple-macosx/debug/ComposeNativeSwift.build/ComposeNativeView.dia"
+  }
+}
