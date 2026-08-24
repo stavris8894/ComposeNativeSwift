@@ -38,14 +38,20 @@ jobs:
             echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           fi
 
-      - name: Publish to Maven Central & GitHub Packages
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew :compose-native-core:publishAllPublicationsToGitHubPackagesRepository \
+            -Pversion=${{ steps.get_version.outputs.VERSION }}
+
+      - name: Publish to Maven Central
+        if: "${{ env.OSSRH_USERNAME != '' }}"
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew :compose-native-core:publishAllPublicationsToSonatypeRepository \
-            :compose-native-core:publishAllPublicationsToGitHubPackagesRepository \
             -Pversion=${{ steps.get_version.outputs.VERSION }}
