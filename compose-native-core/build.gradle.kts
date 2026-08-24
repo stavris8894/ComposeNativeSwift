@@ -85,7 +85,7 @@ publishing {
         }
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/composenative/ComposeNativeSwift")
+            url = uri("https://maven.pkg.github.com/stavris8894/ComposeNativeSwift")
             credentials {
                 username = project.findProperty("gpr.user") as? String ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") as? String ?: System.getenv("GITHUB_TOKEN")
@@ -97,7 +97,7 @@ publishing {
         pom {
             name.set("ComposeNativeSwift Core")
             description.set("Kotlin Multiplatform library translating Compose UI declarations into 100% genuine native SwiftUI views on iOS")
-            url.set("https://github.com/composenative/ComposeNativeSwift")
+            url.set("https://github.com/stavris8894/ComposeNativeSwift")
             licenses {
                 license {
                     name.set("The Apache License, Version 2.0")
@@ -106,14 +106,14 @@ publishing {
             }
             developers {
                 developer {
-                    id.set("composenative")
+                    id.set("stavris8894")
                     name.set("ComposeNative Contributors")
                 }
             }
             scm {
-                connection.set("scm:git:git://github.com/composenative/ComposeNativeSwift.git")
-                developerConnection.set("scm:git:ssh://github.com/composenative/ComposeNativeSwift.git")
-                url.set("https://github.com/composenative/ComposeNativeSwift")
+                connection.set("scm:git:git://github.com/stavris8894/ComposeNativeSwift.git")
+                developerConnection.set("scm:git:ssh://github.com/stavris8894/ComposeNativeSwift.git")
+                url.set("https://github.com/stavris8894/ComposeNativeSwift")
             }
         }
     }

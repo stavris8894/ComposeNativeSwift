@@ -47,13 +47,14 @@ jobs:
 
       - name: Publish to GitHub Packages
         env:
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ./gradlew :compose-native-core:publishAllPublicationsToGitHubPackagesRepository \
             -Pversion=${{ steps.get_version.outputs.VERSION }}
 
       - name: Publish to Maven Central (Sonatype)
-        if: env.OSSRH_USERNAME != ''
+        if: "${{ secrets.OSSRH_USERNAME != '' }}"
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
