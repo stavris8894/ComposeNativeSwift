@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-// MARK: - Color Bridge
+// MARK: - Color Bridge & Theme
 
 public struct CNSwiftColor: Equatable, Sendable {
     public let red: Double
@@ -51,17 +51,88 @@ public struct CNSwiftColor: Equatable, Sendable {
     }
 
     public static let primary = CNSwiftColor(hex: "#007AFF", name: "primary")
+    public static let primaryContainer = CNSwiftColor(hex: "#DCE8FF", name: "primaryContainer")
     public static let secondary = CNSwiftColor(hex: "#5856D6", name: "secondary")
+    public static let secondaryContainer = CNSwiftColor(hex: "#EBEAFF", name: "secondaryContainer")
+    public static let tertiary = CNSwiftColor(hex: "#009688", name: "tertiary")
     public static let accent = CNSwiftColor(hex: "#FF9500", name: "accent")
     public static let surface = CNSwiftColor(hex: "#FFFFFF", name: "surface")
+    public static let surfaceVariant = CNSwiftColor(hex: "#E5E5EA", name: "surfaceVariant")
     public static let background = CNSwiftColor(hex: "#F2F2F7", name: "background")
     public static let onSurface = CNSwiftColor(hex: "#1C1C1E", name: "onSurface")
+    public static let onBackground = CNSwiftColor(hex: "#1C1C1E", name: "onBackground")
     public static let error = CNSwiftColor(hex: "#FF3B30", name: "error")
     public static let success = CNSwiftColor(hex: "#34C759", name: "success")
     public static let warning = CNSwiftColor(hex: "#FFCC00", name: "warning")
     public static let gray = CNSwiftColor(hex: "#8E8E93", name: "gray")
     public static let lightGray = CNSwiftColor(hex: "#D1D1D6", name: "lightGray")
+    public static let darkGray = CNSwiftColor(hex: "#1C1C1E", name: "darkGray")
     public static let clear = CNSwiftColor(red: 0, green: 0, blue: 0, alpha: 0, name: "clear")
+}
+
+// MARK: - Material Theme Color Schemes (Light & Dark)
+
+public struct CNSwiftColorScheme {
+    public let isDark: Bool
+    public let primary: CNSwiftColor
+    public let onPrimary: CNSwiftColor
+    public let primaryContainer: CNSwiftColor
+    public let secondary: CNSwiftColor
+    public let onSecondary: CNSwiftColor
+    public let background: CNSwiftColor
+    public let onBackground: CNSwiftColor
+    public let surface: CNSwiftColor
+    public let onSurface: CNSwiftColor
+    public let surfaceVariant: CNSwiftColor
+    public let error: CNSwiftColor
+    public let success: CNSwiftColor
+    public let outline: CNSwiftColor
+
+    public static let light = CNSwiftColorScheme(
+        isDark: false,
+        primary: CNSwiftColor(hex: "#007AFF"),
+        onPrimary: CNSwiftColor(hex: "#FFFFFF"),
+        primaryContainer: CNSwiftColor(hex: "#DCE8FF"),
+        secondary: CNSwiftColor(hex: "#5856D6"),
+        onSecondary: CNSwiftColor(hex: "#FFFFFF"),
+        background: CNSwiftColor(hex: "#F2F2F7"),
+        onBackground: CNSwiftColor(hex: "#1C1C1E"),
+        surface: CNSwiftColor(hex: "#FFFFFF"),
+        onSurface: CNSwiftColor(hex: "#1C1C1E"),
+        surfaceVariant: CNSwiftColor(hex: "#E5E5EA"),
+        error: CNSwiftColor(hex: "#FF3B30"),
+        success: CNSwiftColor(hex: "#34C759"),
+        outline: CNSwiftColor(hex: "#C6C6C8")
+    )
+
+    public static let dark = CNSwiftColorScheme(
+        isDark: true,
+        primary: CNSwiftColor(hex: "#0A84FF"),
+        onPrimary: CNSwiftColor(hex: "#002A5C"),
+        primaryContainer: CNSwiftColor(hex: "#004085"),
+        secondary: CNSwiftColor(hex: "#5E5CE6"),
+        onSecondary: CNSwiftColor(hex: "#281B66"),
+        background: CNSwiftColor(hex: "#000000"),
+        onBackground: CNSwiftColor(hex: "#FFFFFF"),
+        surface: CNSwiftColor(hex: "#1C1C1E"),
+        onSurface: CNSwiftColor(hex: "#FFFFFF"),
+        surfaceVariant: CNSwiftColor(hex: "#2C2C2E"),
+        error: CNSwiftColor(hex: "#FF453A"),
+        success: CNSwiftColor(hex: "#32D74B"),
+        outline: CNSwiftColor(hex: "#48484A")
+    )
+}
+
+public class CNSwiftThemeState: ObservableObject {
+    @Published public var isDarkMode: Bool = false
+    @Published public var customColorScheme: CNSwiftColorScheme?
+
+    public static let shared = CNSwiftThemeState()
+
+    public var currentColorScheme: CNSwiftColorScheme {
+        if let custom = customColorScheme { return custom }
+        return isDarkMode ? .dark : .light
+    }
 }
 
 // MARK: - Shapes & Geometry

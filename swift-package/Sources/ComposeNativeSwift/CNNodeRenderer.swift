@@ -1,6 +1,7 @@
 import SwiftUI
 
 public struct CNNodeRenderer: View {
+    @ObservedObject private var themeState = CNSwiftThemeState.shared
     public let node: CNRenderableNode
 
     public init(node: CNRenderableNode) {
@@ -39,8 +40,35 @@ public struct CNNodeRenderer: View {
         case let sliderNode as CNSwiftSliderNode:
             renderSlider(sliderNode)
 
+        case let rangeSliderNode as CNSwiftRangeSliderNode:
+            renderRangeSlider(rangeSliderNode)
+
+        case let radioNode as CNSwiftRadioButtonNode:
+            renderRadioButton(radioNode)
+
+        case let chipNode as CNSwiftChipNode:
+            renderChip(chipNode)
+
+        case let segmentedNode as CNSwiftSegmentedButtonNode:
+            renderSegmentedButton(segmentedNode)
+
+        case let listItemNode as CNSwiftListItemNode:
+            renderListItem(listItemNode)
+
+        case let accordionNode as CNSwiftAccordionNode:
+            renderAccordion(accordionNode)
+
+        case let bannerNode as CNSwiftBannerNode:
+            renderBanner(bannerNode)
+
+        case let tabRowNode as CNSwiftTabRowNode:
+            renderTabRow(tabRowNode)
+
         case let lazyListNode as CNSwiftLazyListNode:
             renderLazyList(lazyListNode)
+
+        case let lazyGridNode as CNSwiftLazyGridNode:
+            renderLazyGrid(lazyGridNode)
 
         case let imageNode as CNSwiftImageNode:
             renderImage(imageNode)
@@ -70,21 +98,24 @@ public struct CNNodeRenderer: View {
         }
     }
 
-    // MARK: - Component Renderers
+    // MARK: - Core Renderers
 
     @ViewBuilder
     private func renderText(_ node: CNSwiftTextNode) -> some View {
+        let defaultColor = themeState.isDarkMode ? Color.white : Color(red: 0.11, green: 0.11, blue: 0.12)
+        let resolvedColor = node.style.color.name == "onSurface" ? defaultColor : node.style.color.swiftUIColor
+
         if node.style.isItalic {
             Text(node.text)
                 .font(.system(size: node.style.fontSize, weight: node.style.fontWeight.swiftUIFontWeight))
-                .foregroundColor(node.style.color.swiftUIColor)
+                .foregroundColor(resolvedColor)
                 .italic()
                 .multilineTextAlignment(node.style.alignment)
                 .lineLimit(node.maxLines)
         } else {
             Text(node.text)
                 .font(.system(size: node.style.fontSize, weight: node.style.fontWeight.swiftUIFontWeight))
-                .foregroundColor(node.style.color.swiftUIColor)
+                .foregroundColor(resolvedColor)
                 .multilineTextAlignment(node.style.alignment)
                 .lineLimit(node.maxLines)
         }
@@ -141,6 +172,122 @@ public struct CNNodeRenderer: View {
     }
 
     @ViewBuilder
+    private func renderRangeSlider(_ node: CNSwiftRangeSliderNode) -> some View {
+        CNRangeSliderView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderRadioButton(_ node: CNSwiftRadioButtonNode) -> some View {
+        Button(action: node.onClick) {
+            HStack(spacing: 8) {
+                Image(systemName: node.isSelected ? "largecircle.fill.circle" : "circle")
+                    .foregroundColor(node.isSelected ? node.selectedColor.swiftUIColor : .gray)
+                    .font(.system(size: 20))
+                if let label = node.label {
+                    Text(label)
+                        .foregroundColor(themeState.isDarkMode ? Color.white : Color.primary)
+                        .font(.system(size: 15))
+                }
+            }
+        }
+        .disabled(!node.isEnabled)
+    }
+
+    @ViewBuilder
+    private func renderChip(_ node: CNSwiftChipNode) -> some View {
+        Button(action: node.onClick) {
+            HStack(spacing: 6) {
+                if let icon = node.icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                Text(node.text)
+                    .font(.system(size: 13, weight: node.isSelected ? .bold : .medium))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(node.isSelected ? CNSwiftColor.primary.swiftUIColor.opacity(0.18) : (themeState.isDarkMode ? Color.white.opacity(0.1) : Color.secondary.opacity(0.12)))
+            .foregroundColor(node.isSelected ? CNSwiftColor.primary.swiftUIColor : (themeState.isDarkMode ? Color.white : Color.primary))
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(node.isSelected ? CNSwiftColor.primary.swiftUIColor : Color.clear, lineWidth: 1.2)
+            )
+        }
+        .disabled(!node.isEnabled)
+    }
+
+    @ViewBuilder
+    private func renderSegmentedButton(_ node: CNSwiftSegmentedButtonNode) -> some View {
+        CNSegmentedControlView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderListItem(_ node: CNSwiftListItemNode) -> some View {
+        let content = HStack(spacing: 12) {
+            if let leading = node.leading {
+                CNNodeRenderer(node: leading)
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                CNNodeRenderer(node: node.headline)
+                if let supporting = node.supporting {
+                    CNNodeRenderer(node: supporting)
+                }
+            }
+            Spacer()
+            if let trailing = node.trailing {
+                CNNodeRenderer(node: trailing)
+            }
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 14)
+        .background(themeState.isDarkMode ? Color(red: 0.12, green: 0.12, blue: 0.14) : Color.white)
+        .cornerRadius(10)
+
+        if let onClick = node.onClick {
+            Button(action: onClick) {
+                content
+            }
+            .buttonStyle(.plain)
+        } else {
+            content
+        }
+    }
+
+    @ViewBuilder
+    private func renderAccordion(_ node: CNSwiftAccordionNode) -> some View {
+        CNAccordionView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderBanner(_ node: CNSwiftBannerNode) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(node.text)
+                .font(.system(size: 14))
+                .foregroundColor(themeState.isDarkMode ? .white : .primary)
+            HStack(spacing: 12) {
+                Spacer()
+                if let sec = node.secondaryActionText, let onSec = node.onSecondaryAction {
+                    Button(sec, action: onSec)
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                if let pri = node.primaryActionText, let onPri = node.onPrimaryAction {
+                    Button(pri, action: onPri)
+                        .font(.system(size: 13, weight: .bold))
+                }
+            }
+        }
+        .padding(14)
+        .background(Color.accentColor.opacity(0.15))
+        .cornerRadius(10)
+    }
+
+    @ViewBuilder
+    private func renderTabRow(_ node: CNSwiftTabRowNode) -> some View {
+        CNTabRowView(node: node)
+    }
+
+    @ViewBuilder
     private func renderLazyList(_ node: CNSwiftLazyListNode) -> some View {
         if node.isVertical {
             ScrollView(.vertical, showsIndicators: true) {
@@ -174,13 +321,31 @@ public struct CNNodeRenderer: View {
     }
 
     @ViewBuilder
+    private func renderLazyGrid(_ node: CNSwiftLazyGridNode) -> some View {
+        let columns = Array(repeating: GridItem(.flexible(), spacing: node.spacing), count: node.columnsCount)
+        ScrollView(.vertical, showsIndicators: true) {
+            LazyVGrid(columns: columns, spacing: node.spacing) {
+                ForEach(node.children, id: \.id) { child in
+                    CNNodeRenderer(node: child)
+                }
+            }
+            .padding(EdgeInsets(
+                top: node.contentPadding.top,
+                leading: node.contentPadding.leading,
+                bottom: node.contentPadding.bottom,
+                trailing: node.contentPadding.trailing
+            ))
+        }
+    }
+
+    @ViewBuilder
     private func renderImage(_ node: CNSwiftImageNode) -> some View {
         switch node.source {
         case .sfSymbol(let systemName):
             Image(systemName: systemName)
                 .resizable()
                 .aspectRatio(contentMode: node.contentMode)
-                .foregroundColor(node.tint?.swiftUIColor)
+                .foregroundColor(node.tint?.swiftUIColor ?? (themeState.isDarkMode ? .white : .primary))
 
         case .asset(let name):
             Image(name)
@@ -207,20 +372,27 @@ public struct CNNodeRenderer: View {
 
     @ViewBuilder
     private func renderCard(_ node: CNSwiftCardNode) -> some View {
+        let surfaceColor = themeState.isDarkMode ? Color(red: 0.12, green: 0.12, blue: 0.14) : Color.white
+        let resolvedBg = node.backgroundColor.name == "surface" ? surfaceColor : node.backgroundColor.swiftUIColor
+
         CNNodeRenderer(node: node.content)
-            .background(node.backgroundColor.swiftUIColor)
+            .background(resolvedBg)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-            .shadow(color: Color.black.opacity(0.1), radius: node.elevation, x: 0, y: node.elevation / 2)
+            .shadow(color: themeState.isDarkMode ? Color.clear : Color.black.opacity(0.06), radius: node.elevation, x: 0, y: node.elevation / 2)
     }
 
     @ViewBuilder
     private func renderScaffold(_ node: CNSwiftScaffoldNode) -> some View {
+        let bgColor = themeState.isDarkMode ? Color(red: 0.0, green: 0.0, blue: 0.0) : Color(red: 0.95, green: 0.95, blue: 0.97)
         NavigationStack {
-            CNNodeRenderer(node: node.content)
-                .navigationTitle(node.topBarTitle ?? "")
-                #if os(iOS)
-                .navigationBarTitleDisplayMode(.inline)
-                #endif
+            ZStack {
+                bgColor.ignoresSafeArea()
+                CNNodeRenderer(node: node.content)
+            }
+            .navigationTitle(node.topBarTitle ?? "")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
         }
     }
 
@@ -259,9 +431,118 @@ public struct CNNodeRenderer: View {
     }
 }
 
-// MARK: - Stateful Control Views
+// MARK: - Interactive Views
+
+struct CNAccordionView: View {
+    @ObservedObject private var themeState = CNSwiftThemeState.shared
+    let node: CNSwiftAccordionNode
+    @State private var expanded: Bool = false
+
+    var body: some View {
+        DisclosureGroup(node.title, isExpanded: $expanded) {
+            CNNodeRenderer(node: node.content)
+                .padding(.top, 8)
+        }
+        .padding(14)
+        .background(themeState.isDarkMode ? Color(red: 0.12, green: 0.12, blue: 0.14) : Color.white)
+        .cornerRadius(10)
+        .onAppear {
+            expanded = node.isExpanded
+        }
+        .onChange(of: expanded) { newValue in
+            node.onToggle(newValue)
+        }
+    }
+}
+
+struct CNTabRowView: View {
+    let node: CNSwiftTabRowNode
+    @State private var selectedIndex: Int = 0
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(0..<node.tabs.count, id: \.self) { index in
+                    let isSelected = selectedIndex == index
+                    Button(action: {
+                        selectedIndex = index
+                        node.onTabSelected(index)
+                    }) {
+                        Text(node.tabs[index])
+                            .font(.system(size: 14, weight: isSelected ? .bold : .medium))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(isSelected ? CNSwiftColor.primary.swiftUIColor : Color.clear)
+                            .foregroundColor(isSelected ? .white : Color.primary)
+                            .clipShape(Capsule())
+                    }
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+        }
+        .onAppear {
+            selectedIndex = node.selectedIndex
+        }
+    }
+}
+
+struct CNSegmentedControlView: View {
+    let node: CNSwiftSegmentedButtonNode
+    @State private var selectedIndex: Int = 0
+
+    var body: some View {
+        Picker("", selection: $selectedIndex) {
+            ForEach(0..<node.items.count, id: \.self) { index in
+                Text(node.items[index]).tag(index)
+            }
+        }
+        .pickerStyle(.segmented)
+        .onAppear {
+            selectedIndex = node.selectedIndex
+        }
+        .onChange(of: selectedIndex) { newValue in
+            node.onSelectIndex(newValue)
+        }
+    }
+}
+
+struct CNRangeSliderView: View {
+    let node: CNSwiftRangeSliderNode
+    @State private var minVal: Float = 0
+    @State private var maxVal: Float = 1
+
+    var body: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Text("\(Int(minVal * 100))%")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("\(Int(maxVal * 100))%")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            HStack(spacing: 12) {
+                Slider(value: $minVal, in: node.min...maxVal)
+                Slider(value: $maxVal, in: minVal...node.max)
+            }
+        }
+        .onAppear {
+            minVal = node.startValue
+            maxVal = node.endValue
+        }
+        .onChange(of: minVal) { newValue in
+            node.onValuesChange(newValue, maxVal)
+        }
+        .onChange(of: maxVal) { newValue in
+            node.onValuesChange(minVal, newValue)
+        }
+    }
+}
 
 struct CNTextFieldView: View {
+    @ObservedObject private var themeState = CNSwiftThemeState.shared
     let node: CNSwiftTextFieldNode
     @State private var text: String = ""
 
@@ -275,11 +556,11 @@ struct CNTextFieldView: View {
         }
         .disabled(!node.isEnabled)
         .padding(12)
-        .background(Color.secondary.opacity(0.08))
+        .background(themeState.isDarkMode ? Color(red: 0.16, green: 0.16, blue: 0.18) : Color(red: 0.95, green: 0.95, blue: 0.97))
         .cornerRadius(8)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
-                .stroke(node.isError ? Color.red : Color.gray.opacity(0.4), lineWidth: 1)
+                .stroke(node.isError ? Color.red : Color.gray.opacity(0.3), lineWidth: 1)
         )
         .onAppear {
             text = node.value

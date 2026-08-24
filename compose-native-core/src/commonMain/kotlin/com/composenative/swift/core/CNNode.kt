@@ -10,9 +10,6 @@ sealed class CNNode(
     val id: String = generateNodeId("node"),
     val modifier: CNModifier = CNModifier.None
 ) {
-    /**
-     * Extracts all modifier elements for fast translation by the Swift renderer.
-     */
     val modifierElements: List<CNModifier.Element> by lazy {
         val list = mutableListOf<CNModifier.Element>()
         modifier.foldIn(Unit) { _, element ->
@@ -49,6 +46,24 @@ class CNBoxNode(
     val children: List<CNNode> = emptyList()
 ) : CNNode(id, modifier)
 
+class CNFlowRowNode(
+    id: String = generateNodeId("flow_row"),
+    modifier: CNModifier = CNModifier.None,
+    val horizontalArrangement: CNArrangement = CNArrangement.Start,
+    val verticalArrangement: CNArrangement = CNArrangement.Top,
+    val maxItemsInEachRow: Int = Int.MAX_VALUE,
+    val children: List<CNNode> = emptyList()
+) : CNNode(id, modifier)
+
+class CNFlowColumnNode(
+    id: String = generateNodeId("flow_col"),
+    modifier: CNModifier = CNModifier.None,
+    val horizontalArrangement: CNArrangement = CNArrangement.Start,
+    val verticalArrangement: CNArrangement = CNArrangement.Top,
+    val maxItemsInEachColumn: Int = Int.MAX_VALUE,
+    val children: List<CNNode> = emptyList()
+) : CNNode(id, modifier)
+
 class CNSpacerNode(
     id: String = generateNodeId("spacer"),
     modifier: CNModifier = CNModifier.None
@@ -56,6 +71,13 @@ class CNSpacerNode(
 
 class CNDividerNode(
     id: String = generateNodeId("divider"),
+    modifier: CNModifier = CNModifier.None,
+    val color: CNColor = CNColor.Divider,
+    val thickness: CNDp = 1.dp
+) : CNNode(id, modifier)
+
+class CNVerticalDividerNode(
+    id: String = generateNodeId("v_divider"),
     modifier: CNModifier = CNModifier.None,
     val color: CNColor = CNColor.Divider,
     val thickness: CNDp = 1.dp
@@ -75,7 +97,7 @@ class CNTextNode(
 ) : CNNode(id, modifier)
 
 // -------------------------------------------------------------------------
-// Button Nodes
+// Button & Action Nodes
 // -------------------------------------------------------------------------
 
 class CNButtonNode(
@@ -95,8 +117,57 @@ class CNIconButtonNode(
     val icon: CNIconNode
 ) : CNNode(id, modifier)
 
+class CNExtendedFabNode(
+    id: String = generateNodeId("ext_fab"),
+    modifier: CNModifier = CNModifier.None,
+    val onClick: () -> Unit,
+    val text: String,
+    val icon: CNIconNode? = null,
+    val expanded: Boolean = true,
+    val containerColor: CNColor = CNColor.Primary,
+    val contentColor: CNColor = CNColor.OnPrimary
+) : CNNode(id, modifier)
+
 // -------------------------------------------------------------------------
-// Input & Control Nodes
+// Chips & Segmented Controls
+// -------------------------------------------------------------------------
+
+enum class CNChipType {
+    Filter,
+    Assist,
+    Input,
+    Suggestion
+}
+
+class CNChipNode(
+    id: String = generateNodeId("chip"),
+    modifier: CNModifier = CNModifier.None,
+    val text: String,
+    val selected: Boolean = false,
+    val onClick: () -> Unit,
+    val leadingIcon: CNIconNode? = null,
+    val trailingIcon: CNIconNode? = null,
+    val chipType: CNChipType = CNChipType.Filter,
+    val enabled: Boolean = true
+) : CNNode(id, modifier)
+
+data class CNSegmentItem(
+    val id: String,
+    val label: String,
+    val icon: String? = null
+)
+
+class CNSegmentedButtonNode(
+    id: String = generateNodeId("seg_btn"),
+    modifier: CNModifier = CNModifier.None,
+    val items: List<CNSegmentItem>,
+    val selectedIndex: Int,
+    val onSelectIndex: (Int) -> Unit,
+    val enabled: Boolean = true
+) : CNNode(id, modifier)
+
+// -------------------------------------------------------------------------
+// Input & Selection Nodes
 // -------------------------------------------------------------------------
 
 class CNTextFieldNode(
@@ -135,6 +206,18 @@ class CNSliderNode(
     val activeColor: CNColor = CNColor.Primary
 ) : CNNode(id, modifier)
 
+class CNRangeSliderNode(
+    id: String = generateNodeId("range_slider"),
+    modifier: CNModifier = CNModifier.None,
+    val startValue: Float,
+    val endValue: Float,
+    val onValuesChange: (start: Float, end: Float) -> Unit,
+    val valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
+    val steps: Int = 0,
+    val enabled: Boolean = true,
+    val activeColor: CNColor = CNColor.Primary
+) : CNNode(id, modifier)
+
 class CNCheckboxNode(
     id: String = generateNodeId("cb"),
     modifier: CNModifier = CNModifier.None,
@@ -144,8 +227,18 @@ class CNCheckboxNode(
     val checkedColor: CNColor = CNColor.Primary
 ) : CNNode(id, modifier)
 
+class CNRadioButtonNode(
+    id: String = generateNodeId("rb"),
+    modifier: CNModifier = CNModifier.None,
+    val selected: Boolean,
+    val onClick: () -> Unit,
+    val label: String? = null,
+    val enabled: Boolean = true,
+    val selectedColor: CNColor = CNColor.Primary
+) : CNNode(id, modifier)
+
 // -------------------------------------------------------------------------
-// List Nodes
+// List, Grid & Item Nodes
 // -------------------------------------------------------------------------
 
 class CNLazyColumnNode(
@@ -164,8 +257,34 @@ class CNLazyRowNode(
     val children: List<CNNode> = emptyList()
 ) : CNNode(id, modifier)
 
+sealed class CNGridCells {
+    data class Fixed(val count: Int) : CNGridCells()
+    data class Adaptive(val minSize: CNDp) : CNGridCells()
+}
+
+class CNLazyGridNode(
+    id: String = generateNodeId("lazy_grid"),
+    modifier: CNModifier = CNModifier.None,
+    val columns: CNGridCells = CNGridCells.Fixed(2),
+    val horizontalArrangement: CNArrangement = CNArrangement.spacedBy(8.dp),
+    val verticalArrangement: CNArrangement = CNArrangement.spacedBy(8.dp),
+    val contentPadding: CNPadding = CNPadding.Zero,
+    val children: List<CNNode> = emptyList()
+) : CNNode(id, modifier)
+
+class CNListItemNode(
+    id: String = generateNodeId("list_item"),
+    modifier: CNModifier = CNModifier.None,
+    val headlineContent: CNNode,
+    val supportingContent: CNNode? = null,
+    val leadingContent: CNNode? = null,
+    val trailingContent: CNNode? = null,
+    val overlineContent: CNNode? = null,
+    val onClick: (() -> Unit)? = null
+) : CNNode(id, modifier)
+
 // -------------------------------------------------------------------------
-// Media Nodes
+// Media & Container Nodes
 // -------------------------------------------------------------------------
 
 class CNImageNode(
@@ -186,10 +305,6 @@ class CNIconNode(
     val size: CNDp = 24.dp
 ) : CNNode(id, modifier)
 
-// -------------------------------------------------------------------------
-// Surface & Container Nodes
-// -------------------------------------------------------------------------
-
 class CNCardNode(
     id: String = generateNodeId("card"),
     modifier: CNModifier = CNModifier.None,
@@ -209,6 +324,28 @@ class CNSurfaceNode(
     val border: CNBorder? = null,
     val elevation: CNDp = 0.dp,
     val content: CNNode
+) : CNNode(id, modifier)
+
+class CNAccordionNode(
+    id: String = generateNodeId("accordion"),
+    modifier: CNModifier = CNModifier.None,
+    val title: String,
+    val isExpanded: Boolean,
+    val onToggle: (Boolean) -> Unit,
+    val leadingIcon: CNIconNode? = null,
+    val content: CNNode
+) : CNNode(id, modifier)
+
+class CNBannerNode(
+    id: String = generateNodeId("banner"),
+    modifier: CNModifier = CNModifier.None,
+    val text: String,
+    val icon: CNIconNode? = null,
+    val primaryActionText: String? = null,
+    val onPrimaryAction: (() -> Unit)? = null,
+    val secondaryActionText: String? = null,
+    val onSecondaryAction: (() -> Unit)? = null,
+    val backgroundColor: CNColor = CNColor.PrimaryContainer
 ) : CNNode(id, modifier)
 
 // -------------------------------------------------------------------------
@@ -234,8 +371,42 @@ class CNTopAppBarNode(
     val contentColor: CNColor = CNColor.OnSurface
 ) : CNNode(id, modifier)
 
+data class CNTabItem(
+    val title: String,
+    val icon: String? = null,
+    val badge: String? = null
+)
+
+class CNTabRowNode(
+    id: String = generateNodeId("tab_row"),
+    modifier: CNModifier = CNModifier.None,
+    val tabs: List<CNTabItem>,
+    val selectedTabIndex: Int,
+    val onTabSelected: (Int) -> Unit,
+    val containerColor: CNColor = CNColor.Surface,
+    val contentColor: CNColor = CNColor.Primary
+) : CNNode(id, modifier)
+
+data class CNNavigationItem(
+    val id: String,
+    val label: String,
+    val icon: String,
+    val selectedIcon: String? = null,
+    val badge: String? = null
+)
+
+class CNNavigationBarNode(
+    id: String = generateNodeId("nav_bar"),
+    modifier: CNModifier = CNModifier.None,
+    val items: List<CNNavigationItem>,
+    val selectedIndex: Int,
+    val onItemSelected: (Int) -> Unit,
+    val containerColor: CNColor = CNColor.Surface,
+    val contentColor: CNColor = CNColor.Primary
+) : CNNode(id, modifier)
+
 // -------------------------------------------------------------------------
-// Progress & Feedback Nodes
+// Progress, Feedback & Dialog Nodes
 // -------------------------------------------------------------------------
 
 class CNCircularProgressIndicatorNode(
@@ -261,6 +432,27 @@ class CNBadgeNode(
     val backgroundColor: CNColor = CNColor.Error,
     val contentColor: CNColor = CNColor.White,
     val content: CNNode? = null
+) : CNNode(id, modifier)
+
+class CNDialogNode(
+    id: String = generateNodeId("dialog"),
+    modifier: CNModifier = CNModifier.None,
+    val isVisible: Boolean,
+    val onDismissRequest: () -> Unit,
+    val title: String,
+    val text: String,
+    val confirmButtonText: String = "OK",
+    val onConfirm: () -> Unit,
+    val dismissButtonText: String? = null,
+    val onDismiss: (() -> Unit)? = null
+) : CNNode(id, modifier)
+
+class CNBottomSheetNode(
+    id: String = generateNodeId("sheet"),
+    modifier: CNModifier = CNModifier.None,
+    val isVisible: Boolean,
+    val onDismissRequest: () -> Unit,
+    val content: CNNode
 ) : CNNode(id, modifier)
 
 class CNEmptyNode(id: String = generateNodeId("empty")) : CNNode(id, CNModifier.None)

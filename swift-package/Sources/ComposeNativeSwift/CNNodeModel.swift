@@ -148,6 +148,200 @@ public final class CNSwiftSliderNode: CNSwiftBaseNode {
     }
 }
 
+public final class CNSwiftRangeSliderNode: CNSwiftBaseNode {
+    public var startValue: Float
+    public var endValue: Float
+    public let onValuesChange: (Float, Float) -> Void
+    public let min: Float
+    public let max: Float
+    public let step: Float
+    public let isEnabled: Bool
+    public let activeColor: CNSwiftColor
+
+    public init(
+        id: String = UUID().uuidString,
+        startValue: Float = 0.2,
+        endValue: Float = 0.8,
+        onValuesChange: @escaping (Float, Float) -> Void,
+        min: Float = 0,
+        max: Float = 1,
+        step: Float = 0,
+        isEnabled: Bool = true,
+        activeColor: CNSwiftColor = .primary,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.startValue = startValue
+        self.endValue = endValue
+        self.onValuesChange = onValuesChange
+        self.min = min
+        self.max = max
+        self.step = step
+        self.isEnabled = isEnabled
+        self.activeColor = activeColor
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftRadioButtonNode: CNSwiftBaseNode {
+    public let isSelected: Bool
+    public let onClick: () -> Void
+    public let label: String?
+    public let isEnabled: Bool
+    public let selectedColor: CNSwiftColor
+
+    public init(
+        id: String = UUID().uuidString,
+        isSelected: Bool,
+        onClick: @escaping () -> Void,
+        label: String? = nil,
+        isEnabled: Bool = true,
+        selectedColor: CNSwiftColor = .primary,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.isSelected = isSelected
+        self.onClick = onClick
+        self.label = label
+        self.isEnabled = isEnabled
+        self.selectedColor = selectedColor
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftChipNode: CNSwiftBaseNode {
+    public let text: String
+    public let isSelected: Bool
+    public let onClick: () -> Void
+    public let icon: String?
+    public let isEnabled: Bool
+
+    public init(
+        id: String = UUID().uuidString,
+        text: String,
+        isSelected: Bool = false,
+        onClick: @escaping () -> Void,
+        icon: String? = nil,
+        isEnabled: Bool = true,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.text = text
+        self.isSelected = isSelected
+        self.onClick = onClick
+        self.icon = icon
+        self.isEnabled = isEnabled
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftSegmentedButtonNode: CNSwiftBaseNode {
+    public let items: [String]
+    public let selectedIndex: Int
+    public let onSelectIndex: (Int) -> Void
+
+    public init(
+        id: String = UUID().uuidString,
+        items: [String],
+        selectedIndex: Int,
+        onSelectIndex: @escaping (Int) -> Void,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.items = items
+        self.selectedIndex = selectedIndex
+        self.onSelectIndex = onSelectIndex
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftListItemNode: CNSwiftBaseNode {
+    public let headline: CNRenderableNode
+    public let supporting: CNRenderableNode?
+    public let leading: CNRenderableNode?
+    public let trailing: CNRenderableNode?
+    public let onClick: (() -> Void)?
+
+    public init(
+        id: String = UUID().uuidString,
+        headline: CNRenderableNode,
+        supporting: CNRenderableNode? = nil,
+        leading: CNRenderableNode? = nil,
+        trailing: CNRenderableNode? = nil,
+        onClick: (() -> Void)? = nil,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.headline = headline
+        self.supporting = supporting
+        self.leading = leading
+        self.trailing = trailing
+        self.onClick = onClick
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftAccordionNode: CNSwiftBaseNode {
+    public let title: String
+    public var isExpanded: Bool
+    public let onToggle: (Bool) -> Void
+    public let content: CNRenderableNode
+
+    public init(
+        id: String = UUID().uuidString,
+        title: String,
+        isExpanded: Bool = false,
+        onToggle: @escaping (Bool) -> Void,
+        content: CNRenderableNode,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.title = title
+        self.isExpanded = isExpanded
+        self.onToggle = onToggle
+        self.content = content
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftBannerNode: CNSwiftBaseNode {
+    public let text: String
+    public let primaryActionText: String?
+    public let onPrimaryAction: (() -> Void)?
+    public let secondaryActionText: String?
+    public let onSecondaryAction: (() -> Void)?
+
+    public init(
+        id: String = UUID().uuidString,
+        text: String,
+        primaryActionText: String? = nil,
+        onPrimaryAction: (() -> Void)? = nil,
+        secondaryActionText: String? = nil,
+        onSecondaryAction: (() -> Void)? = nil,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.text = text
+        self.primaryActionText = primaryActionText
+        self.onPrimaryAction = onPrimaryAction
+        self.secondaryActionText = secondaryActionText
+        self.onSecondaryAction = onSecondaryAction
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftTabRowNode: CNSwiftBaseNode {
+    public let tabs: [String]
+    public let selectedIndex: Int
+    public let onTabSelected: (Int) -> Void
+
+    public init(
+        id: String = UUID().uuidString,
+        tabs: [String],
+        selectedIndex: Int,
+        onTabSelected: @escaping (Int) -> Void,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.tabs = tabs
+        self.selectedIndex = selectedIndex
+        self.onTabSelected = onTabSelected
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
 public final class CNSwiftLazyListNode: CNSwiftBaseNode {
     public let isVertical: Bool
     public let spacing: CGFloat
@@ -156,6 +350,21 @@ public final class CNSwiftLazyListNode: CNSwiftBaseNode {
 
     public init(id: String = UUID().uuidString, isVertical: Bool = true, spacing: CGFloat = 0, contentPadding: CNSwiftPadding = CNSwiftPadding(), children: [CNRenderableNode] = [], modifiers: [CNSwiftModifierElement] = []) {
         self.isVertical = isVertical
+        self.spacing = spacing
+        self.contentPadding = contentPadding
+        self.children = children
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftLazyGridNode: CNSwiftBaseNode {
+    public let columnsCount: Int
+    public let spacing: CGFloat
+    public let contentPadding: CNSwiftPadding
+    public let children: [CNRenderableNode]
+
+    public init(id: String = UUID().uuidString, columnsCount: Int = 2, spacing: CGFloat = 8, contentPadding: CNSwiftPadding = CNSwiftPadding(), children: [CNRenderableNode] = [], modifiers: [CNSwiftModifierElement] = []) {
+        self.columnsCount = columnsCount
         self.spacing = spacing
         self.contentPadding = contentPadding
         self.children = children
