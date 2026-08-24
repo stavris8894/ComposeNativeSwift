@@ -103,6 +103,11 @@ public struct CNModifierApplier: ViewModifier {
                 )
             )
 
+        case .liquidGlass(let properties):
+            return AnyView(
+                CNLiquidGlassContainer(properties: properties, content: view)
+            )
+
         case .haptic(let type):
             return AnyView(
                 view.onTapGesture {

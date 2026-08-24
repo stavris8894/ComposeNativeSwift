@@ -5,6 +5,7 @@ import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
 enum class ShowcaseTab {
+    Navigation,
     Counter,
     Form,
     Feed,
@@ -17,8 +18,9 @@ enum class ShowcaseTab {
  * Showcase Master Screen that hosts and toggles between all demo screens.
  */
 class ShowcaseScreen : CNScreen() {
-    var selectedTab by mutableStateOf(ShowcaseTab.Counter)
+    var selectedTab by mutableStateOf(ShowcaseTab.Navigation)
 
+    private val navigationDemoScreen = NavigationDemoScreen()
     private val counterScreen = CounterScreen()
     private val formScreen = FormInputsScreen()
     private val feedScreen = FeedScreen()
@@ -28,6 +30,7 @@ class ShowcaseScreen : CNScreen() {
 
     init {
         registerState(counterScreen.run { mutableStateOf(0) }) // Bind nested sub-screens
+        navigationDemoScreen.addListener { notifyStateChanged() }
         counterScreen.addListener { notifyStateChanged() }
         formScreen.addListener { notifyStateChanged() }
         feedScreen.addListener { notifyStateChanged() }
@@ -47,7 +50,7 @@ class ShowcaseScreen : CNScreen() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 6.dp, vertical = 6.dp),
+                        .padding(horizontal = 4.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -60,7 +63,7 @@ class ShowcaseScreen : CNScreen() {
                                     if (isSelected) CNColor.Primary.copyWithAlpha(0.15f) else CNColor.Transparent,
                                     CNShape.RoundedCorner(8.dp)
                                 )
-                                .padding(horizontal = 8.dp, vertical = 6.dp)
+                                .padding(horizontal = 6.dp, vertical = 5.dp)
                                 .haptic(CNHapticType.Light)
                         ) {
                             Text(
@@ -78,6 +81,7 @@ class ShowcaseScreen : CNScreen() {
         // Screen Body
         add(
             when (selectedTab) {
+                ShowcaseTab.Navigation -> navigationDemoScreen.render()
                 ShowcaseTab.Counter -> counterScreen.render()
                 ShowcaseTab.Form -> formScreen.render()
                 ShowcaseTab.Feed -> feedScreen.render()

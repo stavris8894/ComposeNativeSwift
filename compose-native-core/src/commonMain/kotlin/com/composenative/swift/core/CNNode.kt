@@ -570,4 +570,29 @@ class CNBottomSheetNode(
     val content: CNNode
 ) : CNNode(id, modifier)
 
+// -------------------------------------------------------------------------
+// Navigation & Liquid Glass Nodes
+// -------------------------------------------------------------------------
+
+class CNNavHostNode(
+    id: String = generateNodeId("nav_host"),
+    modifier: CNModifier = CNModifier.None,
+    val activeRoute: String,
+    val backStackCount: Int,
+    val currentTitle: String,
+    val navBarStyle: String,
+    val showBackButton: Boolean,
+    val onPopBack: () -> Unit,
+    val content: CNNode
+) : CNNode(id, modifier)
+
+class CNLiquidGlassNode(
+    id: String = generateNodeId("liquid_glass"),
+    modifier: CNModifier = CNModifier.None,
+    val blurRadius: CNDp = 20.dp,
+    val cornerRadius: CNDp = 24.dp,
+    val content: CNNode
+) : CNNode(id, modifier)
+
 class CNEmptyNode(id: String = generateNodeId("empty")) : CNNode(id, CNModifier.None)
+

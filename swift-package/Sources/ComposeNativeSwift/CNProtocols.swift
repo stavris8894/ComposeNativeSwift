@@ -296,6 +296,28 @@ public enum CNSwiftKeyboardType: Equatable {
     case decimal
 }
 
+public struct CNSwiftLiquidGlassProperties: Equatable {
+    public let blurRadius: CGFloat
+    public let tint: CNSwiftColor
+    public let borderHighlight: CNSwiftColor
+    public let cornerRadius: CGFloat
+    public let specularOpacity: Double
+
+    public init(
+        blurRadius: CGFloat = 20,
+        tint: CNSwiftColor = CNSwiftColor(red: 1, green: 1, blue: 1, alpha: 0.12),
+        borderHighlight: CNSwiftColor = CNSwiftColor(red: 1, green: 1, blue: 1, alpha: 0.35),
+        cornerRadius: CGFloat = 24,
+        specularOpacity: Double = 0.45
+    ) {
+        self.blurRadius = blurRadius
+        self.tint = tint
+        self.borderHighlight = borderHighlight
+        self.cornerRadius = cornerRadius
+        self.specularOpacity = specularOpacity
+    }
+}
+
 // MARK: - Modifier Models
 
 public enum CNSwiftModifierElement {
@@ -312,6 +334,7 @@ public enum CNSwiftModifierElement {
     case weight(Float)
     case blur(CGFloat)
     case material(type: CNSwiftMaterialType, shape: CNSwiftShape)
+    case liquidGlass(CNSwiftLiquidGlassProperties)
     case haptic(type: CNHapticType)
     case refreshable(action: () -> Void)
     case searchable(query: String, onQueryChange: (String) -> Void, placeholder: String)

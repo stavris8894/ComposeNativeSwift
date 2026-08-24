@@ -153,6 +153,49 @@ State changes in Kotlin automatically notify SwiftUI to re-render the native vie
 
 ---
 
+## 🧭 Multi-Screen Navigation & Liquid Glass
+
+ComposeNativeSwift provides full Compose Navigation DSL that renders into SwiftUI `NavigationStack` with **Liquid Glass navigation bars & frosted specular materials**:
+
+```kotlin
+class StoreScreen : CNScreen() {
+    val navController = rememberNavController()
+
+    override fun build(): CNNode = NavHost(
+        navController = navController,
+        startDestination = "catalog"
+    ) {
+        composable(
+            route = "catalog",
+            title = "Spatial Store 🪐",
+            navBarStyle = CNNavBarStyle.LiquidGlass
+        ) {
+            Button(
+                onClick = { navController.navigate("details") },
+                modifier = Modifier.liquidGlass(blurRadius = 24.dp, cornerRadius = 18.dp)
+            ) {
+                Text("View Product Details ➔")
+            }
+        }
+
+        composable(
+            route = "details",
+            title = "Device Specs",
+            navBarStyle = CNNavBarStyle.LiquidGlass
+        ) {
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.liquidGlass()
+            ) {
+                Text("Back to Store")
+            }
+        }
+    }
+}
+```
+
+---
+
 ## 🧩 Component Catalog
 
 ComposeNativeSwift supports all core Compose UI & Material 3 components:

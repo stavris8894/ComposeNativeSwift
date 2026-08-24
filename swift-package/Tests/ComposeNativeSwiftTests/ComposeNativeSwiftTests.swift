@@ -120,6 +120,44 @@ final class ComposeNativeSwiftTests: XCTestCase {
         XCTAssertEqual(textNode.modifierElements.count, 3)
     }
 
+    func testNavigationHostAndBackStack() {
+        var backPopped = false
+        let content = CNSwiftTextNode(text: "Detail Screen")
+        let navHost = CNSwiftNavHostNode(
+            activeRoute: "details",
+            backStackCount: 2,
+            currentTitle: "Product Detail",
+            navBarStyle: "LiquidGlass",
+            showBackButton: true,
+            onPopBack: { backPopped = true },
+            content: content
+        )
+
+        XCTAssertEqual(navHost.activeRoute, "details")
+        XCTAssertEqual(navHost.backStackCount, 2)
+        XCTAssertEqual(navHost.currentTitle, "Product Detail")
+        XCTAssertTrue(navHost.showBackButton)
+        XCTAssertFalse(backPopped)
+
+        navHost.onPopBack()
+        XCTAssertTrue(backPopped)
+    }
+
+    func testLiquidGlassNodeAndProperties() {
+        let glass = CNSwiftLiquidGlassNode(
+            properties: CNSwiftLiquidGlassProperties(
+                blurRadius: 25,
+                cornerRadius: 28,
+                specularOpacity: 0.5
+            ),
+            content: CNSwiftTextNode(text: "Glass Content")
+        )
+
+        XCTAssertEqual(glass.properties.blurRadius, 25)
+        XCTAssertEqual(glass.properties.cornerRadius, 28)
+        XCTAssertEqual(glass.properties.specularOpacity, 0.5)
+    }
+
     func testStateObserverUpdate() {
         class MockScreen: CNStateObservableScreen {
             var count = 0

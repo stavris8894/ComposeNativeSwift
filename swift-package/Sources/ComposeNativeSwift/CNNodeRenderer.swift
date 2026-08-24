@@ -100,6 +100,12 @@ public struct CNNodeRenderer: View {
         case let scaffoldNode as CNSwiftScaffoldNode:
             renderScaffold(scaffoldNode)
 
+        case let navHostNode as CNSwiftNavHostNode:
+            renderNavHost(navHostNode)
+
+        case let liquidGlassNode as CNSwiftLiquidGlassNode:
+            renderLiquidGlass(liquidGlassNode)
+
         case let progressNode as CNSwiftProgressNode:
             renderProgress(progressNode)
 
@@ -117,6 +123,36 @@ public struct CNNodeRenderer: View {
         default:
             EmptyView()
         }
+    }
+
+    // MARK: - Navigation & Liquid Glass Renderers
+
+    @ViewBuilder
+    private func renderNavHost(_ node: CNSwiftNavHostNode) -> some View {
+        let bgColor = themeState.isDarkMode ? Color.black : Color(red: 0.95, green: 0.95, blue: 0.97)
+        ZStack(alignment: .top) {
+            bgColor.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                if node.navBarStyle != "Hidden" {
+                    CNLiquidGlassNavBar(
+                        title: node.currentTitle,
+                        showBackButton: node.showBackButton,
+                        onBack: node.onPopBack
+                    )
+                }
+
+                CNNodeRenderer(node: node.content)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func renderLiquidGlass(_ node: CNSwiftLiquidGlassNode) -> some View {
+        CNLiquidGlassContainer(
+            properties: node.properties,
+            content: AnyView(CNNodeRenderer(node: node.content))
+        )
     }
 
     // MARK: - Core Renderers
