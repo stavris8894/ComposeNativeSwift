@@ -5,74 +5,83 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.10-blue.svg?logo=kotlin)](https://kotlinlang.org)
 [![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange.svg?logo=swift)](https://developer.apple.com/swift/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-iOS%2016%2B-blue.svg?logo=apple)](https://developer.apple.com/xcode/swiftui/)
-[![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-Android-green.svg?logo=android)](https://developer.android.com/jetpack/compose)
+[![CI](https://github.com/stavris8894/ComposeNativeSwift/actions/workflows/ci.yml/badge.svg)](https://github.com/stavris8894/ComposeNativeSwift/actions/workflows/ci.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ---
 
-## 🌟 Why ComposeNativeSwift?
+## 🌟 Overview
 
-Standard Compose Multiplatform (CMP) on iOS renders onto a custom Skiko (Metal/OpenGL) canvas. While useful, it loses genuine iOS platform advantages.
+Unlike standard Compose Multiplatform (which draws on a canvas via Skiko/OpenGL), **ComposeNativeSwift** translates your Compose UI hierarchy directly into **100% genuine native SwiftUI views**:
 
-**ComposeNativeSwift** takes a fundamentally different approach:
-- 📱 **100% True Native SwiftUI Components**: Text is `SwiftUI.Text`, Buttons are `SwiftUI.Button`, Lists are `SwiftUI.ScrollView + LazyVStack`, Text fields are `SwiftUI.TextField` with native iOS autocorrect and keyboards.
-- ⚡ **Zero Canvas Overhead**: Ultra-fast native rendering with 120Hz Apple ProMotion support.
-- ♿ **Full iOS Accessibility & VoiceOver**: Works out of the box with zero extra code.
-- 🎯 **Minimal / Zero Configuration in Swift**: Embed any Kotlin screen in **exactly 1 line of SwiftUI**: `ComposeNativeView(screen: MyScreen())`.
-- 🔄 **Reactive State Synchronization**: Kotlin `mutableStateOf` bridges directly into SwiftUI's `@Published` / `ObservableObject` reactive lifecycle.
-- 🤖 **Built-in AI Assistant Skill**: Pre-configured with an Antigravity AI skill for automatic code generation and conversion.
+- 📱 **True Native Views**: `Text` ➔ `SwiftUI.Text`, `Button` ➔ `SwiftUI.Button`, `TextField` ➔ `SwiftUI.TextField` (with iOS autocorrect, secure text entry, and system keyboards).
+- ⚡ **Zero Canvas Overhead**: Fluid 120 FPS ProMotion animations with native battery efficiency.
+- ♿ **Native iOS Accessibility**: VoiceOver and Dynamic Type work automatically.
+- 🌓 **Material 3 & Dark Theme**: Built-in `CNTheme` engine that automatically adapts between Light and Dark mode.
+- 🎯 **1 Line of SwiftUI**: Render any shared screen with `ComposeNativeView(screen: MyScreen())`.
 
 ---
 
-## 🏗️ Architecture
+## 📦 Installation
+
+### 1. Kotlin Multiplatform (`build.gradle.kts`)
+
+Add the dependency to your shared module:
+
+```kotlin
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    // Export framework for iOS
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "SharedApp"
+            isStatic = true
+            export("com.composenative.swift:compose-native-core:1.0.0")
+        }
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            api("com.composenative.swift:compose-native-core:1.0.0")
+        }
+    }
+}
+```
+
+### 2. iOS App (Swift Package Manager)
+
+In Xcode, go to **File > Add Package Dependencies...** and enter:
 
 ```
-┌────────────────────────────────────────────────────────┐
-│               Kotlin Multiplatform (Shared)            │
-│  - Screen (CNScreen)                                   │
-│  - State (var count by mutableStateOf(0))              │
-│  - Composables (Column, Row, Text, Button, TextField)  │
-│  - Virtual Node Tree (CNNode)                          │
-└───────────────────────────┬────────────────────────────┘
-                            │ (Reactive Listener Callback)
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│                   Swift / SwiftUI (iOS)                │
-│  - ComposeNativeView(screen: MyScreen())               │
-│  - CNStateObserver (ObservableObject / @Published)     │
-│  - CNNodeRenderer                                      │
-│  - 100% Native SwiftUI Views (VStack, Text, Button...) │
-└────────────────────────────────────────────────────────┘
+https://github.com/stavris8894/ComposeNativeSwift.git
 ```
 
----
+Or add it to your `Package.swift`:
 
-## 📦 Project Structure
-
-```
-ComposeNativeSwift/
-├── compose-native-core/      # KMP Library module (Kotlin declarative DSL & node tree)
-├── swift-package/            # Swift Package (Pure SwiftUI native rendering engine)
-├── demo/
-│   ├── shared/               # Shared KMP demo screens (Counter, Form, Feed, Profile, Settings)
-│   ├── iosApp/               # SwiftUI iOS application demo
-│   └── androidApp/           # Jetpack Compose Android application demo
-├── .agents/skills/           # Antigravity AI skill for future AI pair programming
-└── README.md
+```swift
+dependencies: [
+    .package(url: "https://github.com/stavris8894/ComposeNativeSwift.git", from: "1.0.0")
+]
 ```
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Write your Screen in Kotlin (Shared KMP)
+### 1. Define your Screen in Kotlin (`commonMain`)
 
-Subclass `CNScreen` and return your UI tree from `build()`:
+Subclass `CNScreen` and write familiar Compose declarative code:
 
 ```kotlin
-package com.composenative.demo
+package com.example.shared
 
-import com.composenative.swift.*
 import com.composenative.swift.components.*
 import com.composenative.swift.core.*
 
@@ -89,8 +98,8 @@ class CounterScreen : CNScreen() {
             add(
                 Text(
                     text = "Count: $count",
-                    style = TextStyle(fontSize = 36.sp, fontWeight = FontWeight.Bold),
-                    color = if (count >= 0) CNColor.Success else CNColor.Error
+                    style = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold),
+                    color = if (count >= 0) CNColor.Primary else CNColor.Error
                 )
             )
             add(
@@ -101,17 +110,17 @@ class CounterScreen : CNScreen() {
                     add(
                         Button(
                             onClick = { count-- },
-                            modifier = Modifier.weight(1f).height(48.dp).background(CNColor.Error)
+                            modifier = Modifier.weight(1f).height(48.dp)
                         ) {
-                            Text("Decrement", color = CNColor.White)
+                            Text("Decrement")
                         }
                     )
                     add(
                         Button(
                             onClick = { count++ },
-                            modifier = Modifier.weight(1f).height(48.dp).background(CNColor.Success)
+                            modifier = Modifier.weight(1f).height(48.dp)
                         ) {
-                            Text("Increment", color = CNColor.White)
+                            Text("Increment")
                         }
                     )
                 }
@@ -121,9 +130,9 @@ class CounterScreen : CNScreen() {
 }
 ```
 
-### 2. Display in SwiftUI (iOS App)
+### 2. Display in SwiftUI (`iOS App`)
 
-In your iOS SwiftUI project, import `ComposeNativeSwift` and your shared framework:
+Display the Kotlin screen in exactly **1 line of SwiftUI**:
 
 ```swift
 import SwiftUI
@@ -132,44 +141,64 @@ import SharedApp
 
 struct ContentView: View {
     var body: some View {
-        // Exactly 1 line of code!
         ComposeNativeView(screen: CounterScreen())
     }
 }
 ```
 
-That's it! When you tap Increment/Decrement in SwiftUI, it invokes the Kotlin lambda, updates Kotlin state, and re-renders the SwiftUI view instantly.
+State changes in Kotlin automatically notify SwiftUI to re-render the native view tree reactively!
 
 ---
 
-## 📋 Component Mapping Reference
+## 🧩 Component Catalog
 
-| Jetpack Compose API | ComposeNative Component | SwiftUI Native View |
+ComposeNativeSwift supports all core Compose UI & Material 3 components:
+
+| Category | Kotlin Multiplatform API | SwiftUI Native Mapping |
 | :--- | :--- | :--- |
-| `Column { ... }` | `Column { ... }` | `SwiftUI.VStack` |
-| `Row { ... }` | `Row { ... }` | `SwiftUI.HStack` |
-| `Box { ... }` | `Box { ... }` | `SwiftUI.ZStack` |
-| `Text("Hello")` | `Text("Hello")` | `SwiftUI.Text("Hello")` |
-| `Button(onClick) { ... }` | `Button(onClick) { ... }` | `SwiftUI.Button(action)` |
-| `TextField(value, onValueChange)` | `TextField(...)` | `SwiftUI.TextField(...)` |
-| `OutlinedTextField(...)` | `OutlinedTextField(...)` | `SwiftUI.TextField + RoundedBorder` |
-| `Switch(checked, onCheckedChange)` | `Switch(...)` | `SwiftUI.Toggle(...)` |
-| `Slider(value, onValueChange)` | `Slider(...)` | `SwiftUI.Slider(...)` |
-| `LazyColumn { items(list) }` | `LazyColumn { items(list) }` | `SwiftUI.ScrollView { LazyVStack }` |
-| `LazyRow { items(list) }` | `LazyRow { items(list) }` | `SwiftUI.ScrollView { LazyHStack }` |
-| `AsyncImage(url)` | `AsyncImage(url)` | `SwiftUI.AsyncImage(url)` |
-| `Icon(Icons.Add)` | `Icon(Icons.Add)` | `SwiftUI.Image(systemName:)` |
-| `Card { ... }` | `Card(elevation) { ... }` | `SwiftUI.Card + shadow` |
-| `Scaffold(topBar) { ... }` | `Scaffold(...)` | `SwiftUI.NavigationStack` |
-| `CircularProgressIndicator()` | `CircularProgressIndicator()` | `SwiftUI.ProgressView()` |
-| `Divider()` | `Divider()` | `SwiftUI.Divider()` |
-| `Spacer(Modifier.height(16.dp))` | `Spacer(Modifier.height(16.dp))`| `SwiftUI.Spacer()` |
+| **Layouts** | `Column`, `Row`, `Box`, `FlowRow` | `VStack`, `HStack`, `ZStack`, wrap layouts |
+| **Typography** | `Text(text, style, maxLines)` | `SwiftUI.Text` with font weights & colors |
+| **Buttons** | `Button`, `OutlinedButton`, `IconButton`, `ExtendedFloatingActionButton` | `SwiftUI.Button` with native styling |
+| **Inputs** | `TextField`, `OutlinedTextField`, `Switch`, `Slider`, `RangeSlider` | `SwiftUI.TextField`, `Toggle`, `Slider`, dual-thumb range |
+| **Selection** | `FilterChip`, `AssistChip`, `SegmentedButtonRow`, `RadioButton` | SwiftUI Capsule Chips, `Picker(.segmented)`, Radio Groups |
+| **Lists & Grids** | `LazyColumn`, `LazyRow`, `LazyVerticalGrid`, `ListItem` | `ScrollView + LazyVStack / LazyVGrid`, Grouped Cells |
+| **Navigation** | `Scaffold`, `TopAppBar`, `TabRow`, `NavigationBar` | `NavigationStack`, Navigation Title, TabBar |
+| **Containers** | `Card`, `Surface`, `Accordion`, `Banner` | Rounded card elevation, `DisclosureGroup`, Notification banners |
+| **Feedback** | `CircularProgressIndicator`, `LinearProgressIndicator`, `Badge`, `AlertDialog`, `ModalBottomSheet` | `ProgressView`, Badge Capsule, `.alert()`, `.sheet()` |
 
 ---
 
-## 🎨 Modifiers System
+## 🌓 Theme & Dark Mode
 
-Chaining modifiers matches standard Jetpack Compose:
+ComposeNativeSwift includes full Material 3 ColorScheme support:
+
+```kotlin
+// Define theme in Kotlin
+val lightColors = lightColorScheme(
+    primary = CNColor.fromHex("#007AFF"),
+    secondary = CNColor.fromHex("#5856D6"),
+    surface = CNColor.White
+)
+
+val darkColors = darkColorScheme(
+    primary = CNColor.fromHex("#0A84FF"),
+    secondary = CNColor.fromHex("#5E5CE6"),
+    surface = CNColor.fromHex("#1C1C1E")
+)
+```
+
+In SwiftUI, theme colors seamlessly adapt to the iOS system appearance or explicit dark mode overrides:
+
+```swift
+ComposeNativeView(screen: MyScreen())
+    .preferredColorScheme(isDarkMode ? .dark : .light)
+```
+
+---
+
+## 🎨 Modifier Reference
+
+ComposeNativeSwift modifiers use familiar Compose syntax:
 
 ```kotlin
 Modifier
@@ -178,107 +207,31 @@ Modifier
     .padding(horizontal = 16.dp, vertical = 8.dp)
     .background(CNColor.Primary, CNShape.RoundedCorner(12.dp))
     .shadow(elevation = 4.dp)
-    .clickable { /* Handle Tap */ }
+    .clickable { /* handle tap */ }
 ```
 
-### Supported Modifiers
-- **Sizing**: `fillMaxWidth()`, `fillMaxHeight()`, `fillMaxSize()`, `width(dp)`, `height(dp)`, `size(dp)`, `aspectRatio(ratio)`
+- **Sizing**: `fillMaxWidth()`, `fillMaxHeight()`, `fillMaxSize()`, `width(dp)`, `height(dp)`, `size(dp)`, `aspectRatio(ratio)`, `weight(fraction)`
 - **Spacing**: `padding(all)`, `padding(horizontal, vertical)`, `padding(start, top, end, bottom)`
 - **Styling**: `background(color, shape)`, `clip(shape)`, `cornerRadius(radius)`, `border(width, color)`, `shadow(elevation)`
-- **Interactivity**: `clickable(onClick)`
-- **Layout**: `offset(x, y)`, `alpha(opacity)`, `weight(fraction)`
+- **Interactivity**: `clickable { ... }`, `alpha(opacity)`, `offset(x, y)`
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Repository & Testing
 
-### Adding to Kotlin Multiplatform (`build.gradle.kts`)
-
-In your shared KMP module:
-
-```kotlin
-kotlin {
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "SharedApp"
-            isStatic = true
-            export(project(":compose-native-core"))
-        }
-    }
-
-    sourceSets {
-        commonMain.dependencies {
-            implementation(project(":compose-native-core"))
-        }
-    }
-}
-```
-
-### Adding to iOS (`Package.swift` or Xcode SPM)
-
-In your iOS app `Package.swift` or Xcode *File > Add Package Dependencies*:
-
-```swift
-dependencies: [
-    .package(path: "../swift-package") // or remote git repository URL
-]
-```
-
----
-
-## 📱 Running the Demo
-
-### Run JVM & Unit Tests
 ```bash
+# Clone the repository
+git clone https://github.com/stavris8894/ComposeNativeSwift.git
+cd ComposeNativeSwift
+
+# Run JVM & Android check
 ./gradlew check
-```
 
-### Run Swift Package Unit Tests
-```bash
+# Run Swift Package tests
 cd swift-package && swift test
-```
 
-### Compile iOS Simulator Target
-```bash
-./gradlew :demo:shared:compileKotlinIosSimulatorArm64
-```
-
----
-
-## 🚀 CI/CD & Automated Publishing
-
-ComposeNativeSwift includes complete GitHub Actions workflows for multiplatform publishing across Android, JVM, and iOS:
-
-### 1. Workflows
-- **[CI Workflow](.github/workflows/ci.yml)** (`ci.yml`): Runs on every push and PR to `main`. Executes JVM unit tests, Android library compilation, linting, and Swift Package tests on macOS.
-- **[Maven Multiplatform Publisher](.github/workflows/publish-maven.yml)** (`publish-maven.yml`): Publishes Android AARs, JVM JARs, and iOS Kotlin Native Klibs to **Maven Central** (Sonatype) and **GitHub Packages**.
-- **[iOS XCFramework & SPM Publisher](.github/workflows/publish-ios-spm.yml)** (`publish-ios-spm.yml`): Compiles multi-architecture `ComposeNativeCore.xcframework` (arm64, simulator arm64, x64), computes the SHA-256 checksum, uploads binary archives to GitHub Releases, and verifies SPM integration.
-
-### 2. Required GitHub Secrets
-To configure automated releases in your GitHub repository settings (`Settings -> Secrets and variables -> Actions`):
-
-| Secret | Purpose |
-| :--- | :--- |
-| `OSSRH_USERNAME` | Sonatype / Maven Central account username |
-| `OSSRH_PASSWORD` | Sonatype / Maven Central token or password |
-| `SIGNING_KEY` | Armored PGP private key for artifact signing |
-| `SIGNING_PASSWORD` | Passphrase for the PGP private key |
-| `GITHUB_TOKEN` | Automatically supplied by GitHub Actions for GitHub Packages and Release asset creation |
-
-### 3. Manual Publishing via CLI
-```bash
-# Build multi-architecture XCFramework for iOS distribution
+# Build iOS multi-architecture XCFramework
 ./gradlew :compose-native-core:assembleComposeNativeCoreReleaseXCFramework
-
-# Publish to Maven Local
-./gradlew :compose-native-core:publishToMavenLocal
-
-# Publish to Maven Central (staging)
-./gradlew :compose-native-core:publishAllPublicationsToSonatypeRepository -Pversion=1.0.0
 ```
 
 ---
@@ -294,4 +247,3 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 ```
-
