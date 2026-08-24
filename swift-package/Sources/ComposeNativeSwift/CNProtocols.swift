@@ -135,7 +135,7 @@ public class CNSwiftThemeState: ObservableObject {
     }
 }
 
-// MARK: - Shapes & Geometry
+// MARK: - Shapes, Geometry & Materials
 
 public enum CNSwiftShape: Equatable {
     case rectangle
@@ -143,6 +143,42 @@ public enum CNSwiftShape: Equatable {
     case capsule
     case roundedCorner(radius: CGFloat)
     case customRounded(topStart: CGFloat, topEnd: CGFloat, bottomEnd: CGFloat, bottomStart: CGFloat)
+}
+
+public enum CNSwiftMaterialType: Equatable {
+    case ultraThin
+    case thin
+    case regular
+    case thick
+    case ultraThick
+}
+
+public enum CNHapticType: Equatable {
+    case light
+    case medium
+    case heavy
+    case success
+    case warning
+    case error
+
+    public func trigger() {
+        #if os(iOS)
+        switch self {
+        case .light:
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        case .medium:
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        case .heavy:
+            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+        case .success:
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        case .warning:
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+        case .error:
+            UINotificationFeedbackGenerator().notificationOccurred(.error)
+        }
+        #endif
+    }
 }
 
 public struct CNSwiftPadding: Equatable {
@@ -274,5 +310,10 @@ public enum CNSwiftModifierElement {
     case offset(x: CGFloat, y: CGFloat)
     case aspectRatio(CGFloat)
     case weight(Float)
+    case blur(CGFloat)
+    case material(type: CNSwiftMaterialType, shape: CNSwiftShape)
+    case haptic(type: CNHapticType)
+    case refreshable(action: () -> Void)
+    case searchable(query: String, onQueryChange: (String) -> Void, placeholder: String)
     case clickable(action: () -> Void)
 }

@@ -90,6 +90,38 @@ public struct CNModifierApplier: ViewModifier {
                 view.aspectRatio(ratio, contentMode: .fit)
             )
 
+        case .blur(let radius):
+            return AnyView(
+                view.blur(radius: radius)
+            )
+
+        case .material(let type, let shape):
+            return AnyView(
+                view.background(
+                    applyMaterial(type: type)
+                        .clipShape(applyShape(shape: shape))
+                )
+            )
+
+        case .haptic(let type):
+            return AnyView(
+                view.onTapGesture {
+                    type.trigger()
+                }
+            )
+
+        case .refreshable(let action):
+            return AnyView(
+                view.refreshable {
+                    action()
+                }
+            )
+
+        case .searchable(let query, let onQueryChange, let placeholder):
+            return AnyView(
+                CNSearchableView(query: query, onQueryChange: onQueryChange, placeholder: placeholder, content: view)
+            )
+
         case .clickable(let action):
             return AnyView(
                 view.contentShape(Rectangle())
@@ -116,6 +148,44 @@ public struct CNModifierApplier: ViewModifier {
         case .customRounded(let topStart, _, _, _):
             return AnyShape(RoundedRectangle(cornerRadius: topStart))
         }
+    }
+
+    private func applyMaterial(type: CNSwiftMaterialType) -> AnyView {
+        #if os(iOS)
+        switch type {
+        case .ultraThin:
+            return AnyView(Rectangle().fill(.ultraThinMaterial))
+        case .thin:
+            return AnyView(Rectangle().fill(.thinMaterial))
+        case .regular:
+            return AnyView(Rectangle().fill(.regularMaterial))
+        case .thick:
+            return AnyView(Rectangle().fill(.thickMaterial))
+        case .ultraThick:
+            return AnyView(Rectangle().fill(.ultraThickMaterial))
+        }
+        #else
+        return AnyView(Rectangle().fill(Color.secondary.opacity(0.15)))
+        #endif
+    }
+}
+
+struct CNSearchableView: View {
+    let query: String
+    let onQueryChange: (String) -> Void
+    let placeholder: String
+    let content: AnyView
+    @State private var text: String = ""
+
+    var body: some View {
+        content
+            .searchable(text: $text, prompt: placeholder)
+            .onAppear {
+                text = query
+            }
+            .onChange(of: text) { newValue in
+                onQueryChange(newValue)
+            }
     }
 }
 

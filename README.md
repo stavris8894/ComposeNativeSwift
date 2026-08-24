@@ -6,6 +6,7 @@
 [![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange.svg?logo=swift)](https://developer.apple.com/swift/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-iOS%2016%2B-blue.svg?logo=apple)](https://developer.apple.com/xcode/swiftui/)
 [![CI](https://github.com/stavris8894/ComposeNativeSwift/actions/workflows/ci.yml/badge.svg)](https://github.com/stavris8894/ComposeNativeSwift/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/stavris8894/ComposeNativeSwift?logo=github)](https://github.com/stavris8894/ComposeNativeSwift/releases)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
 ---
@@ -18,6 +19,8 @@ Unlike standard Compose Multiplatform (which draws on a canvas via Skiko/OpenGL)
 - ⚡ **Zero Canvas Overhead**: Fluid 120 FPS ProMotion animations with native battery efficiency.
 - ♿ **Native iOS Accessibility**: VoiceOver and Dynamic Type work automatically.
 - 🌓 **Material 3 & Dark Theme**: Built-in `CNTheme` engine that automatically adapts between Light and Dark mode.
+- 🌫️ **Native Glassmorphism & Materials**: Apple UltraThin/Thin materials and blur vibrancy.
+- 📳 **Haptic Feedback Engine**: Native `UIImpactFeedbackGenerator` & `UINotificationFeedbackGenerator` triggers.
 - 🎯 **1 Line of SwiftUI**: Render any shared screen with `ComposeNativeView(screen: MyScreen())`.
 
 ---
@@ -110,7 +113,7 @@ class CounterScreen : CNScreen() {
                     add(
                         Button(
                             onClick = { count-- },
-                            modifier = Modifier.weight(1f).height(48.dp)
+                            modifier = Modifier.weight(1f).height(48.dp).haptic(CNHapticType.Light)
                         ) {
                             Text("Decrement")
                         }
@@ -118,7 +121,7 @@ class CounterScreen : CNScreen() {
                     add(
                         Button(
                             onClick = { count++ },
-                            modifier = Modifier.weight(1f).height(48.dp)
+                            modifier = Modifier.weight(1f).height(48.dp).haptic(CNHapticType.Light)
                         ) {
                             Text("Increment")
                         }
@@ -156,15 +159,18 @@ ComposeNativeSwift supports all core Compose UI & Material 3 components:
 
 | Category | Kotlin Multiplatform API | SwiftUI Native Mapping |
 | :--- | :--- | :--- |
-| **Layouts** | `Column`, `Row`, `Box`, `FlowRow` | `VStack`, `HStack`, `ZStack`, wrap layouts |
-| **Typography** | `Text(text, style, maxLines)` | `SwiftUI.Text` with font weights & colors |
-| **Buttons** | `Button`, `OutlinedButton`, `IconButton`, `ExtendedFloatingActionButton` | `SwiftUI.Button` with native styling |
-| **Inputs** | `TextField`, `OutlinedTextField`, `Switch`, `Slider`, `RangeSlider` | `SwiftUI.TextField`, `Toggle`, `Slider`, dual-thumb range |
+| **Layouts** | `Column`, `Row`, `Box`, `FlowRow`, `FlowColumn`, `Spacer`, `Divider` | `VStack`, `HStack`, `ZStack`, wrap layouts, native dividers |
+| **Typography** | `Text(text, style, maxLines)` | `SwiftUI.Text` with font weights, line limits, and dynamic colors |
+| **Buttons** | `Button`, `OutlinedButton`, `IconButton`, `ExtendedFloatingActionButton` | `SwiftUI.Button` with native styles and tactile feedback |
+| **Inputs** | `TextField`, `OutlinedTextField`, `Switch`, `Slider`, `RangeSlider` | `SwiftUI.TextField`, `Toggle`, `Slider`, dual-thumb range slider |
+| **Pickers & Steppers** | `DatePicker`, `TimePicker`, `Stepper`, `RatingBar` | `SwiftUI.DatePicker`, `Stepper`, custom star rating bar |
+| **Menus & Context** | `DropdownMenu`, `DropdownMenuItem` | `SwiftUI.Menu` with native icons, destructive items, and actions |
+| **Search & Pagers** | `SearchBar`, `HorizontalPager`, `VerticalPager` | `SwiftUI.searchable`, `TabView(.page)` carousel |
 | **Selection** | `FilterChip`, `AssistChip`, `SegmentedButtonRow`, `RadioButton` | SwiftUI Capsule Chips, `Picker(.segmented)`, Radio Groups |
 | **Lists & Grids** | `LazyColumn`, `LazyRow`, `LazyVerticalGrid`, `ListItem` | `ScrollView + LazyVStack / LazyVGrid`, Grouped Cells |
 | **Navigation** | `Scaffold`, `TopAppBar`, `TabRow`, `NavigationBar` | `NavigationStack`, Navigation Title, TabBar |
 | **Containers** | `Card`, `Surface`, `Accordion`, `Banner` | Rounded card elevation, `DisclosureGroup`, Notification banners |
-| **Feedback** | `CircularProgressIndicator`, `LinearProgressIndicator`, `Badge`, `AlertDialog`, `ModalBottomSheet` | `ProgressView`, Badge Capsule, `.alert()`, `.sheet()` |
+| **Feedback** | `Snackbar`, `CircularProgressIndicator`, `LinearProgressIndicator`, `Badge`, `AlertDialog`, `ModalBottomSheet` | Floating toast banner, `ProgressView`, Badge Capsule, `.alert()`, `.sheet()` |
 
 ---
 
@@ -206,14 +212,17 @@ Modifier
     .height(52.dp)
     .padding(horizontal = 16.dp, vertical = 8.dp)
     .background(CNColor.Primary, CNShape.RoundedCorner(12.dp))
+    .material(CNMaterialType.UltraThin, CNShape.RoundedCorner(12.dp)) // Glassmorphism
+    .blur(radius = 4.dp)
+    .haptic(CNHapticType.Medium)
     .shadow(elevation = 4.dp)
     .clickable { /* handle tap */ }
 ```
 
 - **Sizing**: `fillMaxWidth()`, `fillMaxHeight()`, `fillMaxSize()`, `width(dp)`, `height(dp)`, `size(dp)`, `aspectRatio(ratio)`, `weight(fraction)`
 - **Spacing**: `padding(all)`, `padding(horizontal, vertical)`, `padding(start, top, end, bottom)`
-- **Styling**: `background(color, shape)`, `clip(shape)`, `cornerRadius(radius)`, `border(width, color)`, `shadow(elevation)`
-- **Interactivity**: `clickable { ... }`, `alpha(opacity)`, `offset(x, y)`
+- **Styling & Materials**: `background(color, shape)`, `material(type, shape)`, `blur(radius)`, `clip(shape)`, `cornerRadius(radius)`, `border(width, color)`, `shadow(elevation)`
+- **Interactivity & Feedback**: `clickable { ... }`, `haptic(type)`, `refreshable { ... }`, `searchable(query, onQueryChange)`, `alpha(opacity)`, `offset(x, y)`
 
 ---
 

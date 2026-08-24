@@ -33,6 +33,93 @@ final class ComposeNativeSwiftTests: XCTestCase {
         XCTAssertTrue(clicked)
     }
 
+    func testDatePickerAndStepperNodes() {
+        var selectedDateMs: Double = 0
+        let datePicker = CNSwiftDatePickerNode(
+            title: "Date of Birth",
+            timestampMs: 1700000000000,
+            onDateChange: { selectedDateMs = $0 }
+        )
+        XCTAssertEqual(datePicker.title, "Date of Birth")
+        datePicker.onDateChange(1700005000000)
+        XCTAssertEqual(selectedDateMs, 1700005000000)
+
+        var stepperValue: Double = 5
+        let stepper = CNSwiftStepperNode(
+            value: stepperValue,
+            onValueChange: { stepperValue = $0 },
+            min: 0,
+            max: 20,
+            step: 1,
+            label: "Developers"
+        )
+        XCTAssertEqual(stepper.value, 5)
+        stepper.onValueChange(6)
+        XCTAssertEqual(stepperValue, 6)
+    }
+
+    func testMenuAndRatingNodes() {
+        var itemClicked = false
+        let menuItem = CNSwiftMenuItem(
+            title: "Settings",
+            icon: "gear",
+            isDestructive: false,
+            isEnabled: true,
+            onClick: { itemClicked = true }
+        )
+        let menu = CNSwiftMenuNode(title: "Options", items: [menuItem])
+        XCTAssertEqual(menu.items.count, 1)
+        menuItem.onClick()
+        XCTAssertTrue(itemClicked)
+
+        var currentRating = 3
+        let ratingNode = CNSwiftRatingBarNode(
+            rating: currentRating,
+            maxRating: 5,
+            onRatingChange: { currentRating = $0 }
+        )
+        XCTAssertEqual(ratingNode.rating, 3)
+        ratingNode.onRatingChange(5)
+        XCTAssertEqual(currentRating, 5)
+    }
+
+    func testPagerAndSearchBarNodes() {
+        var page = 0
+        let pager = CNSwiftPagerNode(
+            isHorizontal: true,
+            currentPage: page,
+            onPageChange: { page = $0 },
+            children: [
+                CNSwiftTextNode(text: "Page 1"),
+                CNSwiftTextNode(text: "Page 2")
+            ]
+        )
+        XCTAssertEqual(pager.children.count, 2)
+        pager.onPageChange(1)
+        XCTAssertEqual(page, 1)
+
+        var query = ""
+        let search = CNSwiftSearchBarNode(
+            query: query,
+            onQueryChange: { query = $0 },
+            placeholder: "Search components..."
+        )
+        search.onQueryChange("ComposeNative")
+        XCTAssertEqual(query, "ComposeNative")
+    }
+
+    func testModifierApplierWithBlurAndMaterial() {
+        let textNode = CNSwiftTextNode(
+            text: "Vibrant Card",
+            modifiers: [
+                .blur(5),
+                .material(type: .ultraThin, shape: .roundedCorner(radius: 12)),
+                .haptic(type: .medium)
+            ]
+        )
+        XCTAssertEqual(textNode.modifierElements.count, 3)
+    }
+
     func testStateObserverUpdate() {
         class MockScreen: CNStateObservableScreen {
             var count = 0
@@ -58,7 +145,6 @@ final class ComposeNativeSwiftTests: XCTestCase {
                 listeners.removeAll()
             }
         }
-
 
         let screen = MockScreen()
         let observer = CNStateObserver(screen: screen)

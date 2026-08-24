@@ -112,6 +112,184 @@ public final class CNSwiftTextFieldNode: CNSwiftBaseNode {
     }
 }
 
+public final class CNSwiftDatePickerNode: CNSwiftBaseNode {
+    public let title: String
+    public var timestampMs: Double
+    public let onDateChange: (Double) -> Void
+    public let isEnabled: Bool
+
+    public init(
+        id: String = UUID().uuidString,
+        title: String = "Select Date",
+        timestampMs: Double = Date().timeIntervalSince1970 * 1000,
+        onDateChange: @escaping (Double) -> Void,
+        isEnabled: Bool = true,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.title = title
+        self.timestampMs = timestampMs
+        self.onDateChange = onDateChange
+        self.isEnabled = isEnabled
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftStepperNode: CNSwiftBaseNode {
+    public var value: Double
+    public let onValueChange: (Double) -> Void
+    public let min: Double
+    public let max: Double
+    public let step: Double
+    public let label: String
+    public let isEnabled: Bool
+
+    public init(
+        id: String = UUID().uuidString,
+        value: Double,
+        onValueChange: @escaping (Double) -> Void,
+        min: Double = 0,
+        max: Double = 100,
+        step: Double = 1,
+        label: String = "",
+        isEnabled: Bool = true,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.value = value
+        self.onValueChange = onValueChange
+        self.min = min
+        self.max = max
+        self.step = step
+        self.label = label
+        self.isEnabled = isEnabled
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftRatingBarNode: CNSwiftBaseNode {
+    public var rating: Int
+    public let maxRating: Int
+    public let onRatingChange: (Int) -> Void
+    public let isEnabled: Bool
+    public let activeColor: CNSwiftColor
+
+    public init(
+        id: String = UUID().uuidString,
+        rating: Int,
+        maxRating: Int = 5,
+        onRatingChange: @escaping (Int) -> Void,
+        isEnabled: Bool = true,
+        activeColor: CNSwiftColor = .accent,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.rating = rating
+        self.maxRating = maxRating
+        self.onRatingChange = onRatingChange
+        self.isEnabled = isEnabled
+        self.activeColor = activeColor
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftMenuItem: Identifiable {
+    public let id: String
+    public let title: String
+    public let icon: String?
+    public let isDestructive: Bool
+    public let isEnabled: Bool
+    public let onClick: () -> Void
+
+    public init(id: String = UUID().uuidString, title: String, icon: String? = nil, isDestructive: Bool = false, isEnabled: Bool = true, onClick: @escaping () -> Void) {
+        self.id = id
+        self.title = title
+        self.icon = icon
+        self.isDestructive = isDestructive
+        self.isEnabled = isEnabled
+        self.onClick = onClick
+    }
+}
+
+public final class CNSwiftMenuNode: CNSwiftBaseNode {
+    public let title: String
+    public let items: [CNSwiftMenuItem]
+    public let triggerContent: CNRenderableNode?
+
+    public init(
+        id: String = UUID().uuidString,
+        title: String = "Menu",
+        items: [CNSwiftMenuItem] = [],
+        triggerContent: CNRenderableNode? = nil,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.title = title
+        self.items = items
+        self.triggerContent = triggerContent
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftPagerNode: CNSwiftBaseNode {
+    public let isHorizontal: Bool
+    public var currentPage: Int
+    public let onPageChange: (Int) -> Void
+    public let children: [CNRenderableNode]
+
+    public init(
+        id: String = UUID().uuidString,
+        isHorizontal: Bool = true,
+        currentPage: Int = 0,
+        onPageChange: @escaping (Int) -> Void = { _ in },
+        children: [CNRenderableNode] = [],
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.isHorizontal = isHorizontal
+        self.currentPage = currentPage
+        self.onPageChange = onPageChange
+        self.children = children
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftSearchBarNode: CNSwiftBaseNode {
+    public var query: String
+    public let onQueryChange: (String) -> Void
+    public let placeholder: String
+    public let onSearch: (String) -> Void
+
+    public init(
+        id: String = UUID().uuidString,
+        query: String,
+        onQueryChange: @escaping (String) -> Void,
+        placeholder: String = "Search...",
+        onSearch: @escaping (String) -> Void = { _ in },
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.query = query
+        self.onQueryChange = onQueryChange
+        self.placeholder = placeholder
+        self.onSearch = onSearch
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
+public final class CNSwiftSnackbarNode: CNSwiftBaseNode {
+    public let message: String
+    public let actionLabel: String?
+    public let onAction: (() -> Void)?
+
+    public init(
+        id: String = UUID().uuidString,
+        message: String,
+        actionLabel: String? = nil,
+        onAction: (() -> Void)? = nil,
+        modifiers: [CNSwiftModifierElement] = []
+    ) {
+        self.message = message
+        self.actionLabel = actionLabel
+        self.onAction = onAction
+        super.init(id: id, modifiers: modifiers)
+    }
+}
+
 public final class CNSwiftSwitchNode: CNSwiftBaseNode {
     public var isChecked: Bool
     public let onCheckedChange: (Bool) -> Void

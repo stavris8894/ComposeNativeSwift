@@ -34,6 +34,27 @@ public struct CNNodeRenderer: View {
         case let textFieldNode as CNSwiftTextFieldNode:
             renderTextField(textFieldNode)
 
+        case let datePickerNode as CNSwiftDatePickerNode:
+            renderDatePicker(datePickerNode)
+
+        case let stepperNode as CNSwiftStepperNode:
+            renderStepper(stepperNode)
+
+        case let ratingNode as CNSwiftRatingBarNode:
+            renderRatingBar(ratingNode)
+
+        case let menuNode as CNSwiftMenuNode:
+            renderMenu(menuNode)
+
+        case let pagerNode as CNSwiftPagerNode:
+            renderPager(pagerNode)
+
+        case let searchBarNode as CNSwiftSearchBarNode:
+            renderSearchBar(searchBarNode)
+
+        case let snackbarNode as CNSwiftSnackbarNode:
+            renderSnackbar(snackbarNode)
+
         case let switchNode as CNSwiftSwitchNode:
             renderSwitch(switchNode)
 
@@ -159,6 +180,82 @@ public struct CNNodeRenderer: View {
     @ViewBuilder
     private func renderTextField(_ node: CNSwiftTextFieldNode) -> some View {
         CNTextFieldView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderDatePicker(_ node: CNSwiftDatePickerNode) -> some View {
+        CNDatePickerView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderStepper(_ node: CNSwiftStepperNode) -> some View {
+        CNStepperView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderRatingBar(_ node: CNSwiftRatingBarNode) -> some View {
+        CNRatingBarView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderMenu(_ node: CNSwiftMenuNode) -> some View {
+        Menu {
+            ForEach(node.items) { item in
+                Button(role: item.isDestructive ? .destructive : nil, action: item.onClick) {
+                    if let icon = item.icon {
+                        Label(item.title, systemImage: icon)
+                    } else {
+                        Text(item.title)
+                    }
+                }
+                .disabled(!item.isEnabled)
+            }
+        } label: {
+            if let trigger = node.triggerContent {
+                CNNodeRenderer(node: trigger)
+            } else {
+                Label(node.title, systemImage: "ellipsis.circle")
+                    .font(.system(size: 16, weight: .medium))
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func renderPager(_ node: CNSwiftPagerNode) -> some View {
+        TabView(selection: Binding(get: { node.currentPage }, set: { node.onPageChange($0) })) {
+            ForEach(0..<node.children.count, id: \.self) { index in
+                CNNodeRenderer(node: node.children[index])
+                    .tag(index)
+            }
+        }
+        #if os(iOS)
+        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+        #endif
+    }
+
+    @ViewBuilder
+    private func renderSearchBar(_ node: CNSwiftSearchBarNode) -> some View {
+        CNSearchBarView(node: node)
+    }
+
+    @ViewBuilder
+    private func renderSnackbar(_ node: CNSwiftSnackbarNode) -> some View {
+        HStack(spacing: 12) {
+            Text(node.message)
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.white)
+            Spacer()
+            if let actionLabel = node.actionLabel, let onAction = node.onAction {
+                Button(actionLabel, action: onAction)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(CNSwiftColor.accent.swiftUIColor)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color(red: 0.2, green: 0.2, blue: 0.22))
+        .cornerRadius(10)
+        .shadow(radius: 4)
     }
 
     @ViewBuilder
@@ -431,7 +528,108 @@ public struct CNNodeRenderer: View {
     }
 }
 
-// MARK: - Interactive Views
+// MARK: - Interactive Sub-Views
+
+struct CNDatePickerView: View {
+    let node: CNSwiftDatePickerNode
+    @State private var selectedDate: Date = Date()
+
+    var body: some View {
+        DatePicker(
+            node.title,
+            selection: $selectedDate,
+            displayedComponents: [.date]
+        )
+        .disabled(!node.isEnabled)
+        .onAppear {
+            if node.timestampMs > 0 {
+                selectedDate = Date(timeIntervalSince1970: node.timestampMs / 1000)
+            }
+        }
+        .onChange(of: selectedDate) { newDate in
+            node.onDateChange(newDate.timeIntervalSince1970 * 1000)
+        }
+    }
+}
+
+struct CNStepperView: View {
+    let node: CNSwiftStepperNode
+    @State private var value: Double = 0
+
+    var body: some View {
+        Stepper(
+            node.label.isEmpty ? "\(Int(value))" : "\(node.label): \(Int(value))",
+            value: $value,
+            in: node.min...node.max,
+            step: node.step
+        )
+        .disabled(!node.isEnabled)
+        .onAppear {
+            value = node.value
+        }
+        .onChange(of: value) { newValue in
+            node.onValueChange(newValue)
+        }
+    }
+}
+
+struct CNRatingBarView: View {
+    let node: CNSwiftRatingBarNode
+    @State private var currentRating: Int = 0
+
+    var body: some View {
+        HStack(spacing: 6) {
+            ForEach(1...node.maxRating, id: \.self) { star in
+                Button(action: {
+                    currentRating = star
+                    node.onRatingChange(star)
+                }) {
+                    Image(systemName: star <= currentRating ? "star.fill" : "star")
+                        .foregroundColor(star <= currentRating ? node.activeColor.swiftUIColor : Color.gray.opacity(0.4))
+                        .font(.system(size: 22))
+                }
+                .disabled(!node.isEnabled)
+            }
+        }
+        .onAppear {
+            currentRating = node.rating
+        }
+    }
+}
+
+struct CNSearchBarView: View {
+    let node: CNSwiftSearchBarNode
+    @State private var text: String = ""
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+            TextField(node.placeholder, text: $text)
+                .onSubmit {
+                    node.onSearch(text)
+                }
+            if !text.isEmpty {
+                Button(action: {
+                    text = ""
+                    node.onQueryChange("")
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding(10)
+        .background(Color.secondary.opacity(0.1))
+        .cornerRadius(10)
+        .onAppear {
+            text = node.query
+        }
+        .onChange(of: text) { newValue in
+            node.onQueryChange(newValue)
+        }
+    }
+}
 
 struct CNAccordionView: View {
     @ObservedObject private var themeState = CNSwiftThemeState.shared

@@ -84,6 +84,28 @@ class CNVerticalDividerNode(
 ) : CNNode(id, modifier)
 
 // -------------------------------------------------------------------------
+// Pager Nodes
+// -------------------------------------------------------------------------
+
+class CNHorizontalPagerNode(
+    id: String = generateNodeId("h_pager"),
+    modifier: CNModifier = CNModifier.None,
+    val pageCount: Int,
+    val currentPage: Int = 0,
+    val onPageChange: (Int) -> Unit = {},
+    val children: List<CNNode> = emptyList()
+) : CNNode(id, modifier)
+
+class CNVerticalPagerNode(
+    id: String = generateNodeId("v_pager"),
+    modifier: CNModifier = CNModifier.None,
+    val pageCount: Int,
+    val currentPage: Int = 0,
+    val onPageChange: (Int) -> Unit = {},
+    val children: List<CNNode> = emptyList()
+) : CNNode(id, modifier)
+
+// -------------------------------------------------------------------------
 // Text & Typography Nodes
 // -------------------------------------------------------------------------
 
@@ -129,6 +151,58 @@ class CNExtendedFabNode(
 ) : CNNode(id, modifier)
 
 // -------------------------------------------------------------------------
+// Pickers & Stepper Nodes
+// -------------------------------------------------------------------------
+
+enum class CNDatePickerStyle {
+    Compact,
+    Wheel,
+    Graphical
+}
+
+class CNDatePickerNode(
+    id: String = generateNodeId("date_picker"),
+    modifier: CNModifier = CNModifier.None,
+    val title: String = "Select Date",
+    val timestampMs: Long = 0L,
+    val onDateChange: (Long) -> Unit,
+    val style: CNDatePickerStyle = CNDatePickerStyle.Compact,
+    val enabled: Boolean = true
+) : CNNode(id, modifier)
+
+class CNTimePickerNode(
+    id: String = generateNodeId("time_picker"),
+    modifier: CNModifier = CNModifier.None,
+    val title: String = "Select Time",
+    val hour: Int = 12,
+    val minute: Int = 0,
+    val onTimeChange: (hour: Int, minute: Int) -> Unit,
+    val is24Hour: Boolean = true,
+    val enabled: Boolean = true
+) : CNNode(id, modifier)
+
+class CNStepperNode(
+    id: String = generateNodeId("stepper"),
+    modifier: CNModifier = CNModifier.None,
+    val value: Double,
+    val onValueChange: (Double) -> Unit,
+    val range: ClosedFloatingPointRange<Double> = 0.0..100.0,
+    val step: Double = 1.0,
+    val label: String = "",
+    val enabled: Boolean = true
+) : CNNode(id, modifier)
+
+class CNRatingBarNode(
+    id: String = generateNodeId("rating"),
+    modifier: CNModifier = CNModifier.None,
+    val rating: Int,
+    val maxRating: Int = 5,
+    val onRatingChange: (Int) -> Unit,
+    val enabled: Boolean = true,
+    val activeColor: CNColor = CNColor.Accent
+) : CNNode(id, modifier)
+
+// -------------------------------------------------------------------------
 // Chips & Segmented Controls
 // -------------------------------------------------------------------------
 
@@ -167,8 +241,40 @@ class CNSegmentedButtonNode(
 ) : CNNode(id, modifier)
 
 // -------------------------------------------------------------------------
-// Input & Selection Nodes
+// Menus & Context Controls
 // -------------------------------------------------------------------------
+
+data class CNMenuItem(
+    val id: String,
+    val title: String,
+    val icon: String? = null,
+    val isDestructive: Boolean = false,
+    val enabled: Boolean = true,
+    val onClick: () -> Unit
+)
+
+class CNMenuNode(
+    id: String = generateNodeId("menu"),
+    modifier: CNModifier = CNModifier.None,
+    val title: String = "Options",
+    val items: List<CNMenuItem> = emptyList(),
+    val triggerContent: CNNode? = null
+) : CNNode(id, modifier)
+
+// -------------------------------------------------------------------------
+// Search & Input Nodes
+// -------------------------------------------------------------------------
+
+class CNSearchBarNode(
+    id: String = generateNodeId("search_bar"),
+    modifier: CNModifier = CNModifier.None,
+    val query: String,
+    val onQueryChange: (String) -> Unit,
+    val placeholder: String = "Search...",
+    val onSearch: (String) -> Unit = {},
+    val active: Boolean = false,
+    val onActiveChange: (Boolean) -> Unit = {}
+) : CNNode(id, modifier)
 
 class CNTextFieldNode(
     id: String = generateNodeId("tf"),
@@ -432,6 +538,15 @@ class CNBadgeNode(
     val backgroundColor: CNColor = CNColor.Error,
     val contentColor: CNColor = CNColor.White,
     val content: CNNode? = null
+) : CNNode(id, modifier)
+
+class CNSnackbarNode(
+    id: String = generateNodeId("snackbar"),
+    modifier: CNModifier = CNModifier.None,
+    val message: String,
+    val actionLabel: String? = null,
+    val onAction: (() -> Unit)? = null,
+    val isVisible: Boolean = true
 ) : CNNode(id, modifier)
 
 class CNDialogNode(

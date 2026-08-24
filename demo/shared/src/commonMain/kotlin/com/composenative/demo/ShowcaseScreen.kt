@@ -9,6 +9,7 @@ enum class ShowcaseTab {
     Form,
     Feed,
     Profile,
+    Components,
     Settings
 }
 
@@ -22,6 +23,7 @@ class ShowcaseScreen : CNScreen() {
     private val formScreen = FormInputsScreen()
     private val feedScreen = FeedScreen()
     private val profileScreen = ProfileScreen()
+    private val componentsScreen = ComponentsShowcaseScreen()
     private val settingsScreen = SettingsScreen()
 
     init {
@@ -30,6 +32,7 @@ class ShowcaseScreen : CNScreen() {
         formScreen.addListener { notifyStateChanged() }
         feedScreen.addListener { notifyStateChanged() }
         profileScreen.addListener { notifyStateChanged() }
+        componentsScreen.addListener { notifyStateChanged() }
         settingsScreen.addListener { notifyStateChanged() }
     }
 
@@ -44,7 +47,7 @@ class ShowcaseScreen : CNScreen() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                        .padding(horizontal = 6.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -57,7 +60,8 @@ class ShowcaseScreen : CNScreen() {
                                     if (isSelected) CNColor.Primary.copyWithAlpha(0.15f) else CNColor.Transparent,
                                     CNShape.RoundedCorner(8.dp)
                                 )
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                                .padding(horizontal = 8.dp, vertical = 6.dp)
+                                .haptic(CNHapticType.Light)
                         ) {
                             Text(
                                 text = tab.name,
@@ -78,6 +82,7 @@ class ShowcaseScreen : CNScreen() {
                 ShowcaseTab.Form -> formScreen.render()
                 ShowcaseTab.Feed -> feedScreen.render()
                 ShowcaseTab.Profile -> profileScreen.render()
+                ShowcaseTab.Components -> componentsScreen.render()
                 ShowcaseTab.Settings -> settingsScreen.render()
             }
         )

@@ -56,6 +56,35 @@ class CombinedModifier(
 }
 
 // -------------------------------------------------------------------------
+// Materials & Vibrancy Types
+// -------------------------------------------------------------------------
+
+enum class CNMaterialType {
+    UltraThin,
+    Thin,
+    Regular,
+    Thick,
+    UltraThick
+}
+
+enum class CNHapticType {
+    Light,
+    Medium,
+    Heavy,
+    Success,
+    Warning,
+    Error
+}
+
+data class CNSwipeAction(
+    val title: String,
+    val icon: String? = null,
+    val color: CNColor = CNColor.Primary,
+    val isDestructive: Boolean = false,
+    val onClick: () -> Unit
+)
+
+// -------------------------------------------------------------------------
 // Standard Modifier Elements
 // -------------------------------------------------------------------------
 
@@ -76,6 +105,11 @@ data class CNWeightModifier(val weight: Float, val fill: Boolean = true) : CNMod
 data class CNOffsetModifier(val x: CNDp = CNDp.Zero, val y: CNDp = CNDp.Zero) : CNModifier.Element
 data class CNAspectRatioModifier(val ratio: Float, val matchHeightConstraintsFirst: Boolean = false) : CNModifier.Element
 data class CNCornerRadiusModifier(val radius: CNDp) : CNModifier.Element
+data class CNBlurModifier(val radius: CNDp) : CNModifier.Element
+data class CNMaterialModifier(val material: CNMaterialType, val shape: CNShape = CNShape.Rectangle) : CNModifier.Element
+data class CNHapticModifier(val type: CNHapticType) : CNModifier.Element
+data class CNRefreshableModifier(val onRefresh: () -> Unit) : CNModifier.Element
+data class CNSearchableModifier(val query: String, val onQueryChange: (String) -> Unit, val placeholder: String = "Search...") : CNModifier.Element
 data class CNCustomTagModifier(val tag: String, val value: String) : CNModifier.Element
 
 // -------------------------------------------------------------------------
@@ -155,6 +189,21 @@ fun CNModifier.offset(x: CNDp = CNDp.Zero, y: CNDp = CNDp.Zero): CNModifier =
 
 fun CNModifier.aspectRatio(ratio: Float, matchHeightConstraintsFirst: Boolean = false): CNModifier =
     then(CNAspectRatioModifier(ratio, matchHeightConstraintsFirst))
+
+fun CNModifier.blur(radius: CNDp): CNModifier =
+    then(CNBlurModifier(radius))
+
+fun CNModifier.material(material: CNMaterialType, shape: CNShape = CNShape.Rectangle): CNModifier =
+    then(CNMaterialModifier(material, shape))
+
+fun CNModifier.haptic(type: CNHapticType): CNModifier =
+    then(CNHapticModifier(type))
+
+fun CNModifier.refreshable(onRefresh: () -> Unit): CNModifier =
+    then(CNRefreshableModifier(onRefresh))
+
+fun CNModifier.searchable(query: String, onQueryChange: (String) -> Unit, placeholder: String = "Search..."): CNModifier =
+    then(CNSearchableModifier(query, onQueryChange, placeholder))
 
 fun CNModifier.tag(tag: String, value: String): CNModifier =
     then(CNCustomTagModifier(tag, value))
