@@ -1,0 +1,125 @@
+name: Release & Publish (Android & iOS)
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release Version (e.g. 1.0.0)'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # =========================================================================
+  # STEP 1: Android & Kotlin Multiplatform Maven Publishing
+  # =========================================================================
+  publish-android:
+    name: 🤖 Publish Android & KMP
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            TAG_NAME=${{ github.ref_name }}
+            VERSION=${TAG_NAME#v}
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ./gradlew :compose-native-core:publishAllPublicationsToGitHubPackagesRepository \
+            -Pversion=${{ steps.get_version.outputs.VERSION }}
+
+      - name: Publish to Maven Central (Sonatype)
+        if: env.OSSRH_USERNAME != ''
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        run: |
+          ./gradlew :compose-native-core:publishAllPublicationsToSonatypeRepository \
+            -Pversion=${{ steps.get_version.outputs.VERSION }}
+
+  # =========================================================================
+  # STEP 2: iOS XCFramework & Swift Package Distribution
+  # =========================================================================
+  publish-ios:
+    name: 🍏 Publish iOS XCFramework & SPM
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -switch /Applications/Xcode.app
+
+      - name: Determine Version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            TAG_NAME=${{ github.ref_name }}
+            VERSION=${TAG_NAME#v}
+            echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Multi-Architecture XCFramework
+        run: |
+          ./gradlew :compose-native-core:assembleComposeNativeCoreReleaseXCFramework \
+            -Pversion=${{ steps.get_version.outputs.VERSION }}
+
+      - name: Archive XCFramework & Compute Checksum
+        id: archive
+        run: |
+          cd compose-native-core/build/XCFrameworks/release
+          zip -r -y -9 ComposeNativeCore.xcframework.zip ComposeNativeCore.xcframework
+          CHECKSUM=$(shasum -a 256 ComposeNativeCore.xcframework.zip | awk '{print $1}')
+          echo "CHECKSUM=$CHECKSUM" >> $GITHUB_OUTPUT
+          echo "Computed SHA-256 Checksum: $CHECKSUM"
+
+      - name: Upload XCFramework to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
+        with:
+          files: |
+            compose-native-core/build/XCFrameworks/release/ComposeNativeCore.xcframework.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Swift Package Tests
+        run: |
+          cd swift-package
+          swift test
