@@ -249,14 +249,37 @@ cd swift-package && swift test
 
 ---
 
-## 🤖 Antigravity AI Skills
+## 🚀 CI/CD & Automated Publishing
 
-This repository includes a dedicated Antigravity Skill at `.agents/skills/compose-native-swift/SKILL.md`.
+ComposeNativeSwift includes complete GitHub Actions workflows for multiplatform publishing across Android, JVM, and iOS:
 
-When using AI coding assistants (like Antigravity / Gemini CLI):
-- The assistant automatically understands how to write new `CNScreen` components.
-- The assistant can translate existing Jetpack Compose files directly into `ComposeNativeSwift`.
-- The assistant manages Swift Package integration with zero boilerplate.
+### 1. Workflows
+- **[CI Workflow](.github/workflows/ci.yml)** (`ci.yml`): Runs on every push and PR to `main`. Executes JVM unit tests, Android library compilation, linting, and Swift Package tests on macOS.
+- **[Maven Multiplatform Publisher](.github/workflows/publish-maven.yml)** (`publish-maven.yml`): Publishes Android AARs, JVM JARs, and iOS Kotlin Native Klibs to **Maven Central** (Sonatype) and **GitHub Packages**.
+- **[iOS XCFramework & SPM Publisher](.github/workflows/publish-ios-spm.yml)** (`publish-ios-spm.yml`): Compiles multi-architecture `ComposeNativeCore.xcframework` (arm64, simulator arm64, x64), computes the SHA-256 checksum, uploads binary archives to GitHub Releases, and verifies SPM integration.
+
+### 2. Required GitHub Secrets
+To configure automated releases in your GitHub repository settings (`Settings -> Secrets and variables -> Actions`):
+
+| Secret | Purpose |
+| :--- | :--- |
+| `OSSRH_USERNAME` | Sonatype / Maven Central account username |
+| `OSSRH_PASSWORD` | Sonatype / Maven Central token or password |
+| `SIGNING_KEY` | Armored PGP private key for artifact signing |
+| `SIGNING_PASSWORD` | Passphrase for the PGP private key |
+| `GITHUB_TOKEN` | Automatically supplied by GitHub Actions for GitHub Packages and Release asset creation |
+
+### 3. Manual Publishing via CLI
+```bash
+# Build multi-architecture XCFramework for iOS distribution
+./gradlew :compose-native-core:assembleComposeNativeCoreReleaseXCFramework
+
+# Publish to Maven Local
+./gradlew :compose-native-core:publishToMavenLocal
+
+# Publish to Maven Central (staging)
+./gradlew :compose-native-core:publishAllPublicationsToSonatypeRepository -Pversion=1.0.0
+```
 
 ---
 
@@ -271,3 +294,4 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 ```
+

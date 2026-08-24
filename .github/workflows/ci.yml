@@ -1,0 +1,65 @@
+name: CI Build & Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # -------------------------------------------------------------
+  # Job 1: JVM & Android Multiplatform Verification (Ubuntu)
+  # -------------------------------------------------------------
+  jvm-android-verification:
+    name: Android & JVM Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Run Multiplatform Tests & Lint
+        run: ./gradlew check :compose-native-core:jvmTest :demo:shared:compileKotlinJvm
+
+  # -------------------------------------------------------------
+  # Job 2: iOS Native & Swift Package Verification (macOS)
+  # -------------------------------------------------------------
+  ios-swift-verification:
+    name: iOS Native & Swift Package
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle Cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Select Xcode Version
+        run: sudo xcode-select -switch /Applications/Xcode.app
+
+      - name: Compile Kotlin iOS Simulator Target
+        run: ./gradlew :compose-native-core:compileKotlinIosSimulatorArm64
+
+      - name: Run Swift Package Unit Tests
+        run: |
+          cd swift-package
+          swift test
