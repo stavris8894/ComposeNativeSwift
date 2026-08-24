@@ -54,15 +54,18 @@ jobs:
             -Pversion=${{ steps.get_version.outputs.VERSION }}
 
       - name: Publish to Maven Central (Sonatype)
-        if: "${{ secrets.OSSRH_USERNAME != '' }}"
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
         run: |
-          ./gradlew :compose-native-core:publishAllPublicationsToSonatypeRepository \
-            -Pversion=${{ steps.get_version.outputs.VERSION }}
+          if [ -n "$OSSRH_USERNAME" ]; then
+            ./gradlew :compose-native-core:publishAllPublicationsToSonatypeRepository \
+              -Pversion=${{ steps.get_version.outputs.VERSION }}
+          else
+            echo "OSSRH_USERNAME not configured. Skipping Maven Central staging deployment."
+          fi
 
   # =========================================================================
   # STEP 2: iOS XCFramework & Swift Package Distribution
